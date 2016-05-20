@@ -11,6 +11,7 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'ProductController@getAll');
+Route::get('/transaction', 'TransactionController@getAll');
+Route::post('/product/create', 'ProductController@create');
+Route::post('/transaction/create', 'TransactionController@create');
