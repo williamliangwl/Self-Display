@@ -16,7 +16,7 @@
                 <div class="form-group">
                     <input class="form-control" type="number" placeholder="Price" name="price" required/>
                 </div>
-                <button id="add-product-btn" type="submit" class="btn btn-primary" >
+                <button id="add-product-btn" type="submit" class="btn btn-primary">
                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
                 </button>
             </form>
@@ -27,34 +27,38 @@
 
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
-            <h4>Product List</h4>
-            <table class="table">
-                <tr>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    <th>Action</th>
-                </tr>
-                @foreach($products as $product)
+            @if(count($products) == 0)
+                <h3>No product to be showed.</h3>
+            @else
+                <h4>Product List</h4>
+                <table class="table">
                     <tr>
-                        <td>{{$product->name}}</td>
-                        <td>Rp{{$product->price}}</td>
-                        <td>{{$product->stock}}</td>
-                        <td>
-                            <button type="button"
-                                    class="btn btn-primary"
-                                    data-toggle="modal"
-                                    data-target="#recordModal"
-                                    data-id="{{$product->id}}"
-                                    data-name="{{$product->name}}"
-                                    data-price="{{$product->price}}"
-                                    data-stock="{{$product->stock}}">
-                                <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Record
-                            </button>
-                        </td>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Action</th>
                     </tr>
-                @endforeach
-            </table>
+                    @foreach($products as $product)
+                        <tr>
+                            <td>{{$product->name}}</td>
+                            <td>Rp{{$product->price}}</td>
+                            <td>{{$product->stock}}</td>
+                            <td>
+                                <button type="button"
+                                        class="btn btn-primary"
+                                        data-toggle="modal"
+                                        data-target="#recordModal"
+                                        data-id="{{$product->id}}"
+                                        data-name="{{$product->name}}"
+                                        data-price="{{$product->price}}"
+                                        data-stock="{{$product->stock}}">
+                                    <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Record
+                                </button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </table>
+            @endif
         </div>
     </div>
 
@@ -85,7 +89,8 @@
                         <div class="form-group">
                             <label class="col-md-4 control-label" for="item-quantity">Quantity</label>
                             <div class="col-md-7">
-                                <input class="form-control" type="number" placeholder="Quantity" name="quantity" required>
+                                <input class="form-control" type="number" placeholder="Quantity" name="quantity"
+                                       required>
                             </div>
                         </div>
                         {{--<input id="add-transaction-btn" type="button" class="btn btn-primary" value="Record">--}}
