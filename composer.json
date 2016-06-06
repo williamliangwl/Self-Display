@@ -37,6 +37,7 @@
             "php artisan key:generate"
         ],
         "post-install-cmd": [
+            "composer update",
             "Illuminate\\Foundation\\ComposerScripts::postInstall",
             "php artisan optimize"
         ],
