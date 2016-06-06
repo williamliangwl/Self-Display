@@ -2,33 +2,10 @@
 
 @section('content')
 
-    <div class="row ">
-        <div class="col-md-8 col-md-offset-2">
-            <h4>Add Product</h4>
-            <form class="form-inline" name="add-product" action="{{url('/product/create')}}" method="post">
-                <input type="hidden" name="_token" value="{{csrf_token()}}"/>
-                <div class="form-group">
-                    <input class="form-control" type="text" placeholder="Name" name="name" required/>
-                </div>
-                <div class="form-group">
-                    <input class="form-control" type="number" placeholder="Stock" name="stock" required/>
-                </div>
-                <div class="form-group">
-                    <input class="form-control" type="number" placeholder="Price" name="price" required/>
-                </div>
-                <button id="add-product-btn" type="submit" class="btn btn-primary">
-                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <br/>
-
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             @if(count($products) == 0)
-                <h3>No product to be showed.</h3>
+                <h3>No user to be showed.</h3>
             @else
                 <h4>Product List</h4>
                 <table class="table">
@@ -38,20 +15,20 @@
                         <th>Stock</th>
                         <th>Action</th>
                     </tr>
-                    @foreach($products as $product)
+                    @foreach($products as $user)
                         <tr>
-                            <td>{{$product->name}}</td>
-                            <td>Rp{{$product->price}}</td>
-                            <td>{{$product->stock}}</td>
+                            <td>{{$user->name}}</td>
+                            <td>Rp{{$user->price}}</td>
+                            <td>{{$user->stock}}</td>
                             <td>
                                 <button type="button"
                                         class="btn btn-primary"
                                         data-toggle="modal"
                                         data-target="#recordModal"
-                                        data-id="{{$product->id}}"
-                                        data-name="{{$product->name}}"
-                                        data-price="{{$product->price}}"
-                                        data-stock="{{$product->stock}}">
+                                        data-id="{{$user->id}}"
+                                        data-name="{{$user->name}}"
+                                        data-price="{{$user->price}}"
+                                        data-stock="{{$user->stock}}">
                                     <span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Record
                                 </button>
                             </td>
@@ -62,7 +39,7 @@
         </div>
     </div>
 
-    <form class="form-horizontal" action="{{url('/transaction/create')}}" method="post">
+    <form class="form-horizontal" action="{{url('/transaction/out/create')}}" method="post">
         <div id="recordModal" class="modal fade" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-sm">
                 <div class="modal-content">
@@ -104,10 +81,4 @@
         </div><!-- /.modal -->
     </form>
 
-@endsection
-
-
-
-@section('js')
-    <script type="application/javascript" src="js/index.js"></script>
 @endsection

@@ -4,12 +4,13 @@ namespace App\Http\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Transaction extends Model
+class OutTransaction extends Model
 {
-    protected $table = 'transactions';
+    protected $table = 'out_transactions';
     public $fillable = [
         'id',
         'user_id',
-        'date'
+        'date',
+        'recipient'
     ];
 }

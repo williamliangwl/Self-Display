@@ -4,9 +4,9 @@ namespace App\Http\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DetailTransaction extends Model
+class InDetailTransaction extends Model
 {
-    protected $table = 'detail_transactions';
+    protected $table = 'in_detail_transactions';
     public $fillable = [
         'id',
         'transaction_id',
