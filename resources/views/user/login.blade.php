@@ -25,6 +25,7 @@
                         {!! csrf_field() !!}
                         <button type="submit" class="btn btn-default">Login</button>
                         <span class="text-danger" >{{ session('message')  }}</span>
+                        <span> <a href="{{url('user/register')}}">Register</a> </span>
                     </div>
                 </div>
             </form>
