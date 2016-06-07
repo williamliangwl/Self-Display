@@ -91,7 +91,7 @@ class OutTransactionController extends Controller
     {
         if (Auth::user()) {
             $transaction = $this->getOutTransactions($transactionId);
-            return PDF::loadView('transaction.out.report', ['transaction' => $transaction])->setPaper('a4', 'landscape')->stream('nota-'.transactionId.'.pdf');
+            return PDF::loadView('transaction.out.report', ['transaction' => $transaction])->setPaper('a4', 'landscape')->stream('nota-'.$transactionId.'.pdf');
         }
         else
             return redirect('/');
