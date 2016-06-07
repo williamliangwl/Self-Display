@@ -36,7 +36,7 @@
                 @endif
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li>
+                <li class="hidden-xs" >
                     <a href="">
                         Selamat Datang,
                         @if(Auth::user())

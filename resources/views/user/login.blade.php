@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <div class="panel panel-default" style="width:50%;margin:auto;">
+    <div class="panel panel-default" style="width:55%;margin:auto;">
         <div class="panel-heading">
             Login
         </div>

@@ -8,7 +8,7 @@
                 <h3>No product to be showed.</h3>
             @else
                 <h4>
-                    Pilih Barang
+                    Pilih Barang <br class="visible-xs" >
                     <span>
                         <button id="checkout-button"
                                 class="btn btn-primary"
