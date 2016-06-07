@@ -17,6 +17,7 @@
                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Tambah
                 </button>
             </form>
+            <label id="success-msg" class="text-success"></label>
         </div>
     </div>
     <br>

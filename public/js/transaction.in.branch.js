@@ -48,9 +48,10 @@ $('#add-in-transaction-btn').click(function (event) {
             'stock': $(form['stock']).val()
         },
         function (data) {
-            if (!isNaN(data))
+            if (!isNaN(data)) {
                 getAllProducts();
-            else
+                $('#success-msg').html('Sukses menambah stok ' + $(form['name']).val());
+            }else
                 window.location.href = '/transaction/in';
         }
     )
