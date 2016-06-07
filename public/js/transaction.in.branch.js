@@ -48,7 +48,7 @@ $('#add-in-transaction-btn').click(function (event) {
             'stock': $(form['stock']).val()
         },
         function (data) {
-            if (!isNan(data))
+            if (!isNaN(data))
                 getAllProducts();
             else
                 window.location.href = '/transaction/in';
