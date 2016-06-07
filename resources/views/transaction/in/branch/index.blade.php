@@ -4,6 +4,7 @@
     <div class="row ">
         <div class="col-md-9 col-md-offset-2">
             <h4>Catat Barang Masuk</h4>
+            <label class="text-danger">Nama barang yang ingin ditambah harus sudah sama dengan yang sudah ada.</label>
             <form class="form-inline" name="add-in-transaction" action="{{url('/transaction/in/create')}}"
                   method="post">
                 <input type="hidden" id="_token" name="_token" value="{{csrf_token()}}">
@@ -17,10 +18,9 @@
                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Tambah
                 </button>
             </form>
-            <label id="success-msg" class="text-success"></label>
+            <label id="success-msg"></label>
         </div>
     </div>
-    <br>
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             @if(count($products) == 0)

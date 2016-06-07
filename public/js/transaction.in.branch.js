@@ -40,6 +40,7 @@ function getAllProducts() {
 $('#add-in-transaction-btn').click(function (event) {
     event.preventDefault();
     var form = document.forms['add-in-transaction'];
+    $('#success-msg').toggleClass('text-success').html('Sedang di proses..');
     $.post(
         '/transaction/in/create',
         {
@@ -50,7 +51,7 @@ $('#add-in-transaction-btn').click(function (event) {
         function (data) {
             if (!isNaN(data)) {
                 getAllProducts();
-                $('#success-msg').html('Sukses menambah stok ' + $(form['name']).val());
+                $('#success-msg').toggleClass('text-success').html('Sukses menambah stok ' + $(form['name']).val());
             }else
                 window.location.href = '/transaction/in';
         }
