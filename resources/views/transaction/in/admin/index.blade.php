@@ -2,7 +2,7 @@
 
 @section('content')
 
-    <h3>Transaksi Keluar</h3>
+    <h3>Transaksi Masuk</h3>
     <br>
     <div class="row">
         <div class="col-md-10">

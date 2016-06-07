@@ -61,7 +61,7 @@ $('#name-text-box').autocomplete({
         $.post(
             "/product/findByName",
             {
-                '_token': $('_token').val() ,
+                '_token': $('#_token').val() ,
                 'name': $('#name-text-box').val()
             },
             function (data) {

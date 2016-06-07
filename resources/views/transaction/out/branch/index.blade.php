@@ -79,7 +79,7 @@
                     <span id="error-msg" class="text-danger" ></span>
                     <span id="success-msg" class="text-success" ></span>
                     <input id="_token" type="hidden" value="{{csrf_token()}}">
-                    <a href="#" target="_blank" id="report-button" class="btn btn-success hidden" role="button" data-dismiss="modal">Nota</a>
+                    <a href="#" target="_blank" id="report-button" class="btn btn-success hidden" role="button">Nota</a>
                     <button type="button" id="cancel-button" class="btn btn-default" data-dismiss="modal">Batal</button>
                     <button type="button" id="confirm-button" class="btn btn-primary">Yakin</button>
                 </div>
