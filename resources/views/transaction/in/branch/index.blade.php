@@ -4,7 +4,7 @@
     <div class="row ">
         <div class="col-md-9 col-md-offset-2">
             <h4>Catat Barang Masuk</h4>
-            <label class="text-danger">Nama barang yang ingin ditambah harus sudah sama dengan yang sudah ada.</label>
+            <p class="text-danger">Nama barang yang ingin ditambah harus sudah sama dengan yang sudah ada.</p>
             <form class="form-inline" name="add-in-transaction" action="{{url('/transaction/in/create')}}"
                   method="post">
                 <input type="hidden" id="_token" name="_token" value="{{csrf_token()}}">
