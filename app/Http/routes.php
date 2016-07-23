@@ -38,5 +38,6 @@ Route::get('/transaction/out', 'OutTransactionController@getAll');
 Route::get('/transaction/out/previous', 'OutTransactionController@getPrevious');
 Route::post('/transaction/out/create', 'OutTransactionController@create');
 
-Route::get('/transaction/out/report/{transactionId}', 'OutTransactionController@report');
+Route::get('/transaction/out/report/{transactionId}', 'OutTransactionController@showReport');
+Route::get('/transaction/out/report/{transactionId}/download', 'OutTransactionController@downloadReport');
 Route::get('/report', 'ReportController@index');

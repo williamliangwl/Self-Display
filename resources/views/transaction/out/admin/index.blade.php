@@ -17,9 +17,16 @@
                     <a href="{{url('/transaction/out/report/' . $transaction['transaction_id'])}}"
                        target="_blank"
                        role="button"
-                       class="btn btn-primary"
+                       class="btn btn-primary hidden-xs"
                        style="margin-bottom: 10px;">
                         Lihat Nota
+                    </a>
+                    <a href="{{url('/transaction/out/report/' . $transaction['transaction_id'] . '/download')}}"
+                       target="_blank"
+                       role="button"
+                       class="btn btn-primary visible-xs"
+                       style="margin-bottom: 10px;">
+                        Download Nota
                     </a>
                     <table class="table table-bordered">
                         <tr>

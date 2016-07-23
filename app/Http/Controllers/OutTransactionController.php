@@ -88,11 +88,21 @@ class OutTransactionController extends Controller
             abort(403);
     }
 
-    public function report($transactionId)
+    public function showReport($transactionId)
     {
         if (Auth::user()) {
             $transaction = $this->getOutTransactions($transactionId);
             return PDF::loadView('transaction.out.nota', ['transaction' => $transaction])->setPaper('a4', 'landscape')->stream('nota-'.$transactionId.'.pdf');
+        }
+        else
+            return redirect('/');
+    }
+
+    public function downloadReport($transactionId)
+    {
+        if (Auth::user()) {
+            $transaction = $this->getOutTransactions($transactionId);
+            return PDF::loadView('transaction.out.nota', ['transaction' => $transaction])->setPaper('a4', 'landscape')->download('nota-'.$transactionId.'.pdf');
         }
         else
             return redirect('/');
