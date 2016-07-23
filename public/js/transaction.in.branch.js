@@ -22,6 +22,7 @@ function showProduct(products) {
             '<td>' + products[i]['stock'] + '</td>' +
             '</tr>'
         );
+        productNames.push(products[i]['name']);
     }
 }
 
@@ -60,19 +61,15 @@ $('#add-in-transaction-btn').click(function (event) {
 
 $('#name-text-box').autocomplete({
     source: function (request, response) {
-        $.post(
-            "/product/findByName",
-            {
-                '_token': $('#_token').val() ,
-                'name': $('#name-text-box').val()
-            },
-            function (data) {
-                var productNames = [];
-                $.each(data, function(i, product){
-                    productNames.push(product['name']);
-                });
-                response(productNames);
-            });
+        var suggestions = [];
+
+        $.each(productNames, function(i, name) {
+           if(name.indexOf($('#name-text-box').val()) != -1) {
+               suggestions.push(name);
+           }
+        });
+
+        response(suggestions);
     },
     minLength: 1
 });

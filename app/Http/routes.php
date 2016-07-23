@@ -27,7 +27,6 @@ Route::post('/user/update', 'UserController@update');
 
 Route::get('/product', 'ProductController@index');
 Route::post('/product/all', 'ProductController@getAll');
-Route::post('/product/findByName', 'ProductController@findByName');
 Route::post('/product/create', 'ProductController@create');
 Route::post('/product/delete', 'ProductController@delete');
 Route::post('/product/update', 'ProductController@update');
@@ -40,3 +39,4 @@ Route::get('/transaction/out/previous', 'OutTransactionController@getPrevious');
 Route::post('/transaction/out/create', 'OutTransactionController@create');
 
 Route::get('/transaction/out/report/{transactionId}', 'OutTransactionController@report');
+Route::get('/report', 'ReportController@index');

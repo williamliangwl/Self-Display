@@ -43,14 +43,6 @@ class ProductController extends Controller
             return '';
     }
 
-    public function findByName(Request $request)
-    {
-        if (Auth::user())
-            return Product::where('name', 'like', '%' . $request['name'] . '%')->get();
-        else
-            return '';
-    }
-
     public function create(Request $request)
     {
         if (Auth::user()) {
@@ -60,8 +52,9 @@ class ProductController extends Controller
 
                 $product = Product::create([
                     'name' => $request['name'],
-                    'price' => $request['price'],
+                    'capital_price' => $request['capital_price'],
                     'stock' => $request['stock'],
+                    'price' => $request['capital_price'],
                 ]);
 
                 DB::commit();

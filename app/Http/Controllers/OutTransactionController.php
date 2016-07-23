@@ -65,6 +65,7 @@ class OutTransactionController extends Controller
                         'product_id' => $item['id'],
                         'quantity' => $item['quantity'],
                         'deal_price' => Product::find($item['id'])->price,
+                        'capital_price' => Product::find($item['id'])->capital_price,
                     ]);
 
                     $product = Product::find($outDetailTransaction->product_id);
@@ -91,7 +92,7 @@ class OutTransactionController extends Controller
     {
         if (Auth::user()) {
             $transaction = $this->getOutTransactions($transactionId);
-            return PDF::loadView('transaction.out.report', ['transaction' => $transaction])->setPaper('a4', 'landscape')->stream('nota-'.$transactionId.'.pdf');
+            return PDF::loadView('transaction.out.nota', ['transaction' => $transaction])->setPaper('a4', 'landscape')->stream('nota-'.$transactionId.'.pdf');
         }
         else
             return redirect('/');
@@ -99,13 +100,13 @@ class OutTransactionController extends Controller
 
     private function getOutTransactions($id = '', $user_id = '')
     {
-        $outTransactions = OutTransaction::where('id', $id)->orderBy('id', 'desc')->get();
+        $outTransactions = OutTransaction::where('id', $id)->orderBy('date', 'desc')->get();
 
         if (empty($id))
-            $outTransactions = OutTransaction::orderBy('id', 'desc')->get();
+            $outTransactions = OutTransaction::orderBy('date', 'desc')->get();
 
         if (!empty($user_id))
-            $outTransactions = OutTransaction::where('user_id', $user_id)->orderBy('id', 'desc')->get();
+            $outTransactions = OutTransaction::where('user_id', $user_id)->orderBy('date', 'desc')->get();
 
         $data = [];
 
@@ -139,23 +140,23 @@ class OutTransactionController extends Controller
     private function getMoneyText($money)
     {
         $satuan = [
-            'Nol',
-            'Satu',
-            'Dua',
-            'Tiga',
-            'Empat',
-            'Lima',
-            'Enam',
-            'Tujuh',
-            'Delapan',
-            'Sembilan',
-            'Sepuluh'
+            'Nol ',
+            'Satu ',
+            'Dua ',
+            'Tiga ',
+            'Empat ',
+            'Lima ',
+            'Enam ',
+            'Tujuh ',
+            'Delapan ',
+            'Sembilan ',
+            'Sepuluh '
         ];
 
         $ribuan = [
-            'Miliar',
-            'Juta',
-            'Ribu',
+            'Miliar ',
+            'Juta ',
+            'Ribu ',
             ''
         ];
 
@@ -173,20 +174,20 @@ class OutTransactionController extends Controller
                     if ($left2 > 0) {
                         if ($divider2 == 100) {
                             if ($left2 == 1)
-                                $result .= "Seratus";
+                                $result .= "Seratus ";
                             else
-                                $result .= $satuan[$left2] . " Ratus ";
+                                $result .= $satuan[$left2] . "Ratus ";
                         } else if ($divider2 == 10) {
                             if ($left2 == 1) {
                                 if ($left == 10)
                                     $result .= " Sepuluh ";
                                 else if ($left == 11)
-                                    $result .= "Sebelas";
+                                    $result .= "Sebelas ";
                                 else
-                                    $result .= $satuan[$left - 10] . " Belas ";
+                                    $result .= $satuan[$left - 10] . "Belas ";
                                 break;
                             } else
-                                $result .= $satuan[$left2] . " Puluh ";
+                                $result .= $satuan[$left2] . "Puluh ";
                         } else {
                             $result .= $satuan[$left2];
                         }

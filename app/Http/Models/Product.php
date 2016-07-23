@@ -11,6 +11,7 @@ class Product extends Model
         'id',
         'name',
         'stock',
-        'price'
+        'price',
+        'capital_price'
     ];
 }

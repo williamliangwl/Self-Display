@@ -11,7 +11,7 @@
                     <input class="form-control" type="text" placeholder="Nama" name="name" required/>
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="number" placeholder="Harga" name="price" required/>
+                    <input class="form-control" type="number" placeholder="Harga Modal" name="capital_price" required/>
                 </div>
                 <div class="form-group">
                     <input class="form-control" type="number" placeholder="Stok" name="stock" required/>
@@ -34,13 +34,15 @@
                 <table class="table">
                     <tr>
                         <th>Nama</th>
-                        <th>Harga</th>
+                        <th>Modal</th>
+                        <th>Harga Jual</th>
                         <th>Stok</th>
                         <th>Aksi</th>
                     </tr>
                     @foreach($products as $user)
                         <tr>
                             <td>{{$user->name}}</td>
+                            <td>Rp{{$user->capital_price}}</td>
                             <td>Rp{{$user->price}}</td>
                             <td>{{$user->stock}}</td>
                             <td>
@@ -84,15 +86,15 @@
                     <div class="modal-body">
                         <p class="text-danger">Anda akan menghapus barang berikut</p>
                         <div class="form-group">
-                            <label class="col-md-4 control-label">Name</label>
+                            <label class="col-md-5 control-label">Nama</label>
                             <label id="item-name" class="col-md-7 form-control-static">Name</label>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label">Price</label>
+                            <label class="col-md-5 control-label">Harga Jual</label>
                             <label id="item-price" class="col-md-7 form-control-static">Price</label>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label">Stock</label>
+                            <label class="col-md-5 control-label">Stok</label>
                             <label id="item-stock" class="col-md-7 form-control-static">Stock</label>
                         </div>
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
@@ -119,22 +121,22 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="item-name" class="col-sm-2 control-label">Nama</label>
-                            <div class="col-sm-10">
+                            <label for="item-name" class="col-sm-5 control-label">Nama</label>
+                            <div class="col-sm-7">
                                 <input type="text" class="form-control" id="item-name" name="product_name" placeholder="Nama"
                                        value="" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="item-price" class="col-sm-2 control-label">Harga</label>
-                            <div class="col-sm-10">
-                                <input type="number" class="form-control" id="item-price" name="product_price" placeholder="Harga"
+                            <label for="item-price" class="col-sm-5 control-label">Harga Jual</label>
+                            <div class="col-sm-7">
+                                <input type="number" class="form-control" id="item-price" name="product_price" placeholder="Harga Jual"
                                        value="" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="item-stock" class="col-sm-2 control-label">Stok</label>
-                            <div class="col-sm-10">
+                            <label for="item-stock" class="col-sm-5 control-label">Stok</label>
+                            <div class="col-sm-7">
                                 <input type="number" class="form-control" id="item-stock" name="product_stock" placeholder="Stok"
                                        value="" required>
                             </div>

@@ -21,7 +21,7 @@ class InTransactionController extends Controller
         if (Auth::user()) {
             switch (Auth::user()->role) {
                 case Constants::ROLE_ADMIN:
-                    $inTransactions = InTransaction::all();
+                    $inTransactions = InTransaction::orderBy('date', 'desc')->get();
                     $data = [];
 
                     foreach ($inTransactions as $inTransaction) {

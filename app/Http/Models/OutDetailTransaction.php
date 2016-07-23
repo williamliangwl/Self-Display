@@ -12,6 +12,7 @@ class OutDetailTransaction extends Model
         'transaction_id',
         'product_id',
         'quantity',
-        'deal_price'
+        'deal_price',
+        'capital_price'
     ];
 }

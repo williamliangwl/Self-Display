@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Report</title>
+    <title>Nota {{$transaction[0]['transaction_id']}}</title>
 </head>
 <body>
 
@@ -24,17 +24,17 @@
                             <tr>
                                 <td>NO PO CUST</td>
                                 <td>:</td>
-                                <td>NO PO CUST</td>
+                                <td>{{$transaction[0]['transaction_id']}}</td>
                             </tr>
                             <tr>
                                 <td>JATUH TEMPO</td>
                                 <td>:</td>
-                                <td>TANGGAL JATUH TEMPO</td>
+                                <td>{{$transaction[0]['transaction_date']}}</td>
                             </tr>
                         </table>
                     </td>
                     <td style="width: 50%;">
-                        <p>JAKARTA, {{date('d-M-Y H:i:s')}}</p>
+                        <p>JAKARTA, {{$transaction[0]['transaction_date']}}</p>
                         <p style="font-weight: bold; text-decoration: underline;">Kepada Yth:</p>
                         <p>
 <pre>
