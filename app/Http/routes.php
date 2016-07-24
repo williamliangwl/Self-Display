@@ -40,4 +40,11 @@ Route::post('/transaction/out/create', 'OutTransactionController@create');
 
 Route::get('/transaction/out/report/{transactionId}', 'OutTransactionController@showReport');
 Route::get('/transaction/out/report/{transactionId}/download', 'OutTransactionController@downloadReport');
-Route::get('/report', 'ReportController@index');
+Route::get('/report/monthly', 'ReportController@monthlyReport');
+Route::get('/report/daily', 'ReportController@dailyReport');
+Route::get('/report/weekly', 'ReportController@weeklyReport');
+
+Route::get('/expense', 'ExpenseController@index');
+Route::post('/expense/create', 'ExpenseController@create');
+Route::post('/expense/delete', 'ExpenseController@delete');
+Route::post('/expense/update', 'ExpenseController@update');

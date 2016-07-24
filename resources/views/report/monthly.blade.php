@@ -23,9 +23,9 @@
                         @foreach($data['details'] as $detail)
                             <tr>
                                 <td>{{$detail['date']}}</td>
-                                <td>Rp {{$detail['deal']}}</td>
-                                <td>Rp {{$detail['capital']}}</td>
-                                <td>Rp {{$detail['deal'] - $detail['capital']}}</td>
+                                <td>Rp {{number_format($detail['deal'], 0, ',', '.')}}</td>
+                                <td>Rp {{number_format($detail['capital'], 0, ',', '.')}}</td>
+                                <td>Rp {{number_format($detail['deal'] - $detail['capital'], 0, ',', '.')}}</td>
                             </tr>
                         @endforeach
 

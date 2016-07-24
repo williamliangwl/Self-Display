@@ -45,7 +45,7 @@ class ProductController extends Controller
 
     public function create(Request $request)
     {
-        if (Auth::user()) {
+        if (Auth::user() && Auth::user()->role == Constants::ROLE_ADMIN) {
             try {
 
                 DB::beginTransaction();
@@ -70,7 +70,7 @@ class ProductController extends Controller
 
     public function delete(Request $request)
     {
-        if (Auth::user()) {
+        if (Auth::user() && Auth::user()->role == Constants::ROLE_ADMIN) {
             try {
                 DB::beginTransaction();
 
@@ -91,7 +91,7 @@ class ProductController extends Controller
 
     public function update(Request $request)
     {
-        if (Auth::user()) {
+        if (Auth::user() && Auth::user()->role == Constants::ROLE_ADMIN) {
             try {
 
                 DB::beginTransaction();
