@@ -12,6 +12,7 @@ class Product extends Model
         'name',
         'stock',
         'price',
-        'capital_price'
+        'capital_price',
+        'is_active'
     ];
 }

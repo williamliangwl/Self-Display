@@ -8,6 +8,7 @@
             <form class="form-inline" name="add-in-transaction" action="{{url('/transaction/in/create')}}"
                   method="post">
                 <input type="hidden" id="_token" name="_token" value="{{csrf_token()}}">
+                <input type="hidden" id="id-text" name="id">
                 <div class="form-group">
                     <input id="name-text-box" class="form-control" type="text" placeholder="Nama" name="name" required/>
                 </div>
@@ -18,7 +19,7 @@
                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Tambah
                 </button>
             </form>
-            <label id="success-msg"></label>
+            <label id="msg"></label>
         </div>
     </div>
     <div class="row">

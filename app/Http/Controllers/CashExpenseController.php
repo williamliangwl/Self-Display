@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Constants;
-use App\Http\Models\Expense;
-use Carbon\Carbon;
+use App\Http\Models\CashExpense;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -12,14 +11,14 @@ use App\Http\Controllers\Controller;
 use Auth;
 use DB;
 
-class ExpenseController extends Controller
+class CashExpenseController extends Controller
 {
     public function index()
     {
         if (Auth::user() && Auth::user()->role == Constants::ROLE_ADMIN) {
-            $expenses = Expense::orderBy('date', 'desc')->get();
+            $expenses = CashExpense::orderBy('date', 'desc')->get();
 
-            return view('expense.index', ['expenses' => $expenses]);
+            return view('cash-expense.index', ['expenses' => $expenses]);
 
         } else {
             return redirect('/');
@@ -33,7 +32,7 @@ class ExpenseController extends Controller
 
                 DB::beginTransaction();
 
-                $expense = Expense::create([
+                $expense = CashExpense::create([
                     'date' => $request['date'],
                     'price' => $request['price'],
                     'description' => $request['description'],
@@ -41,7 +40,7 @@ class ExpenseController extends Controller
 
                 DB::commit();
 
-                return redirect('/expense');
+                return redirect('/cash-expense');
             } catch (\Exception $e) {
                 DB::rollback();
                 return $e->getMessage();
@@ -58,11 +57,11 @@ class ExpenseController extends Controller
 
                 $id = $request['id'];
 
-                Expense::destroy($id);
+                CashExpense::destroy($id);
 
                 DB::commit();
 
-                return redirect('/expense');
+                return redirect('/cash-expense');
             } catch (\Exception $e) {
                 DB::rollback();
                 return $e->getMessage();
@@ -90,7 +89,7 @@ class ExpenseController extends Controller
                 $price = $request['price'];
                 $description = $request['description'];
 
-                $expense = Expense::find($id);
+                $expense = CashExpense::find($id);
 
                 if (!$expense) {
                     abort(403);
@@ -103,7 +102,7 @@ class ExpenseController extends Controller
 
                 DB::commit();
 
-                return redirect('/expense');
+                return redirect('/cash-expense');
             } catch (\Exception $e) {
                 DB::rollback();
                 return $e->getMessage();

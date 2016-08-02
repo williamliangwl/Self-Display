@@ -13,6 +13,7 @@ use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Auth;
 use DB;
+use Log;
 
 class InTransactionController extends Controller
 {
@@ -45,7 +46,7 @@ class InTransactionController extends Controller
                     return view('transaction.in.admin.index', ['transactions' => $data]);
                     break;
                 case Constants::ROLE_BRANCH:
-                    $products = Product::all();
+                    $products = Product::where('is_active',true)->orderBy('name')->get();
                     return view('transaction.in.branch.index', ['products' => $products]);
                     break;
             }
@@ -61,12 +62,20 @@ class InTransactionController extends Controller
 
                 DB::beginTransaction();
 
+                $this->validate($request, [
+                    'stock' => 'required',
+                    'name' => 'required_without:id'
+                ]);
+
                 $inTransaction = InTransaction::create([
                     'user_id' => Auth::user()->id,
                     'date' => date('YmdHis')
                 ]);
 
-                $product = Product::where('name', $request['name'])->first();
+                if (empty($request['id']))
+                    $product = Product::where('name', $request['name'])->first();
+                else
+                    $product = Product::find($request['id']);
 
                 if (!$product) {
                     abort(403);

@@ -12,12 +12,18 @@
         <td>
             <table style="width: 100%;">
                 <tr>
-                    <td style="width: 50%;">
-                        <h3 style="text-align: center; margin-bottom:0; text-decoration: underline;">NOTA FAKTUR</h3>
-                        <p style="text-align: center; margin-top:2px; ">NO: {{$transaction[0]['transaction_id']}}</p>
-                        <table style="width: 100%;">
+                    <td style="width: 25%;">
+                        <h1 style="text-align: center; margin:0; ">SB</h1>
+                        <h2 style="text-align: center; margin:0; ">Sentra Baja</h2>
+                        <h5 style="text-align: center; margin:0; font-weight:0;">021-29088695 / 081282319006</h5>
+                        <h5 style="text-align: center; margin:0; font-weight:0;">Jl. Raya Villa Bekasi Indah I <br>  Kp. Kebon Rt. 002/002 Desa Jejalen Jaya <br> Kec. Tambun Utara - Bekasi 17567</h5>
+                    </td>
+                    <td style="width: 40%;">
+                        <h3 style="text-align: center; margin:0; text-decoration: underline;">NOTA FAKTUR</h3>
+                        <br>
+                        <table style="width: 50%; margin:auto;">
                             <tr>
-                                <td>SALES</td>
+                                <td>TOKO</td>
                                 <td>:</td>
                                 <td>{{$transaction[0]['transaction_user_name']}}</td>
                             </tr>
@@ -26,15 +32,10 @@
                                 <td>:</td>
                                 <td>{{$transaction[0]['transaction_id']}}</td>
                             </tr>
-                            <tr>
-                                <td>JATUH TEMPO</td>
-                                <td>:</td>
-                                <td>{{$transaction[0]['transaction_date']}}</td>
-                            </tr>
                         </table>
                     </td>
-                    <td style="width: 50%;">
-                        <p>JAKARTA, {{$transaction[0]['transaction_date']}}</p>
+                    <td style="width: 30%;">
+                        <p>BEKASI, {{$transaction[0]['transaction_date']}}</p>
                         <p style="font-weight: bold; text-decoration: underline;">Kepada Yth:</p>
                         <p>
 <pre>
@@ -54,7 +55,6 @@
                     <th style="text-align: left;" >NAMA BARANG</th>
                     <th style="text-align: left;" >JUMLAH/SATUAN</th>
                     <th style="text-align: left;" >HRG SATUAN</th>
-                    <th style="text-align: left;" >DISKON</th>
                     <th style="text-align: left;" >TOTAL HRG</th>
                 </tr>
                 @foreach($transaction[0]['transaction_details'] as $transactionDetail)
@@ -63,14 +63,13 @@
                         <td>{{$transactionDetail['product_name']}}</td>
                         <td>{{$transactionDetail['product_quantity']}}</td>
                         <td>Rp{{number_format($transactionDetail['product_price'],0,',','.')}}</td>
-                        <td>0%</td>
                         <td>
                             Rp{{number_format($transactionDetail['product_price']*$transactionDetail['product_quantity'],0,',','.')}}
                         </td>
                     </tr>
                 @endforeach
                 <tr>
-                    <td colspan="5" style="height: 40px; vertical-align: bottom" >
+                    <td colspan="4" style="height: 40px; vertical-align: bottom" >
                         Terbilang: {{$transaction[0]['transaction_total_text']}} Rupiah
                     </td>
                     <td style="vertical-align: bottom">

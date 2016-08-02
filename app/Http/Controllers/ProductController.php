@@ -17,7 +17,7 @@ class ProductController extends Controller
     public function index()
     {
         if (Auth::user()) {
-            $products = Product::all();
+            $products = Product::where('is_active', true)->orderBy('name')->get();
 
             switch (Auth::user()->role) {
                 case Constants::ROLE_ADMIN:
@@ -38,7 +38,7 @@ class ProductController extends Controller
     public function getAll()
     {
         if (Auth::user())
-            return Product::all();
+            return Product::where('is_active',true)->orderBy('name')->get();
         else
             return '';
     }
@@ -54,7 +54,8 @@ class ProductController extends Controller
                     'name' => $request['name'],
                     'capital_price' => $request['capital_price'],
                     'stock' => $request['stock'],
-                    'price' => $request['capital_price'],
+                    'price' => $request['price'],
+                    'is_active' => true
                 ]);
 
                 DB::commit();
@@ -76,7 +77,9 @@ class ProductController extends Controller
 
                 $id = $request['product_id'];
 
-                Product::destroy($id);
+                $product = Product::find($id);
+                $product->is_active = false;
+                $product->save();
 
                 DB::commit();
 
@@ -100,6 +103,7 @@ class ProductController extends Controller
                     'product_id' => 'required',
                     'product_name' => 'required',
                     'product_price' => 'required',
+                    'product_capital_price' => 'required',
                     'product_stock' => 'required'
                 ]);
 
@@ -107,6 +111,7 @@ class ProductController extends Controller
                 $name = $request['product_name'];
                 $price = $request['product_price'];
                 $stock = $request['product_stock'];
+                $capital = $request['product_capital_price'];
 
                 $product = Product::find($id);
 
@@ -117,6 +122,7 @@ class ProductController extends Controller
                 $product->name = $name;
                 $product->price = $price;
                 $product->stock = $stock;
+                $product->capital_price = $capital;
                 $product->save();
 
                 DB::commit();
@@ -128,5 +134,12 @@ class ProductController extends Controller
             }
         } else
             abort(403);
+    }
+
+    public function check()
+    {
+        if (Auth::user()) {
+            return view('product.branch.check', ['products' => []]);
+        }
     }
 }

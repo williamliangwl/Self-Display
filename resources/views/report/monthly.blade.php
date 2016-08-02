@@ -17,7 +17,9 @@
                             <th>Tanggal</th>
                             <th>Pendapatan</th>
                             <th>Modal</th>
-                            <th>Keuntungan</th>
+                            <th>Pengeluaran</th>
+                            <th>Pendapatan</th>
+                            <th>Pembelian Cash</th>
                         </tr>
 
                         @foreach($data['details'] as $detail)

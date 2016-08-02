@@ -10,6 +10,7 @@ class OutTransaction extends Model
     public $fillable = [
         'id',
         'user_id',
+        'buyer_id',
         'date',
         'recipient'
     ];

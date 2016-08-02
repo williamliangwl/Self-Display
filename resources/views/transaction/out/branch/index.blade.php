@@ -30,10 +30,11 @@
                 <table id="product-table" class="table table-condensed">
                     <tr>
                         <th>Pilih</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Stock</th>
-                        <th>Quantity</th>
+                        <th>Nama</th>
+                        <th>Stok</th>
+                        <th>Harga Jual</th>
+                        <th>Kuantitas</th>
+                        <th>Harga Deal</th>
                     </tr>
                     @foreach($products as $product)
                         <tr>
@@ -41,10 +42,13 @@
                                 <input class="selected-product" type="checkbox" value="{{$product->id}}">
                             </td>
                             <td>{{$product->name}}</td>
-                            <td>Rp{{$product->price}}</td>
                             <td>{{$product->stock}}</td>
+                            <td>Rp{{number_format($product->price, 0, ',', '.')}}</td>
                             <td class="quantity-column" >
                                 <input class="hidden" style="width:50px" type="number" min="1" max="{{$product->stock}}" value="1">
+                            </td>
+                            <td class="deal-price-column" >
+                                <input class="hidden" style="width:70px" type="number" min="1" value="{{$product->price}}">
                             </td>
                         </tr>
                     @endforeach
@@ -62,12 +66,19 @@
                     <h4 class="modal-title">Konfirmasi</h4>
                 </div>
                 <div class="modal-body">
-                    <p>Barang yang akan dibeli</p>
+                    <label style="font-weight: normal;" >Data Pembeli:</label>
+                    <br>
+                    <label>Isi nomor telepon terlebih dahulu. Data pelanggan akan diisi berdasarkan nomor telepon.</label>
                     <div class="form-horizontal">
                         <div class="form-group">
-                            <label class="col-md-1 control-label" for="recipient">Penerima</label>
+                            <div class="col-md-3">
+                                <input type="text" id="phone-text" class="form-control" name="phone" placeholder="Telepon" required>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" id="name-text" class="form-control" name="name" placeholder="Nama" required>
+                            </div>
                             <div class="col-md-5">
-                                <textarea name="recipient" id="recipient" class="form-control" rows="3" required></textarea>
+                                <textarea id="address-text" name="address" id="address" placeholder="Alamat" class="form-control" rows="3" required></textarea>
                             </div>
                         </div>
                     </div>

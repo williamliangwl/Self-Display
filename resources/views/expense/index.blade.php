@@ -4,20 +4,17 @@
 
     <div class="row ">
         <div class="col-md-8 col-md-offset-2">
-            <h4>Tambah Produk</h4>
-            <form class="form-inline" name="add-product" action="{{url('/product/create')}}" method="post">
+            <h4>Tambah Pengeluaran</h4>
+            <form class="form-inline" name="add-expense" action="{{url('/expense/create')}}" method="post">
                 {!! csrf_field() !!}
                 <div class="form-group">
-                    <input class="form-control" type="text" placeholder="Nama" name="name" required/>
+                    <input class="form-control" type="date" placeholder="Tanggal" name="date" value="{{date('Y-m-d')}}" required/>
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="number" placeholder="Harga Modal" min="0" name="capital_price" required/>
+                    <input class="form-control" type="number" placeholder="Jumlah" min="0" name="price" required/>
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="number" placeholder="Harga Jual" min="0" name="price" required/>
-                </div>
-                <div class="form-group">
-                    <input class="form-control" type="number" placeholder="Stok" min="0" name="stock" required/>
+                    <input class="form-control" type="text" placeholder="Deskripsi" name="description" required/>
                 </div>
                 <button id="add-user-btn" type="submit" class="btn btn-primary">
                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Tambah
@@ -30,45 +27,41 @@
 
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
-            @if(count($products) == 0)
-                <h3>No user to be showed.</h3>
+            @if(count($expenses) == 0)
+                <h3>Tidak ada pengeluaran.</h3>
             @else
-                <h4>List Produk</h4>
+                <h4>List Pengeluaran</h4>
                 <table class="table">
                     <tr>
-                        <th>Nama</th>
-                        <th>Modal</th>
-                        <th>Harga Jual</th>
-                        <th>Stok</th>
-                        <th>Aksi</th>
+                        <th>Tanggal</th>
+                        <th>Jumlah</th>
+                        <th>Deskripsi</th>
+                        <th>Action</th>
                     </tr>
-                    @foreach($products as $product)
+                    @foreach($expenses as $expense)
                         <tr>
-                            <td>{{$product->name}}</td>
-                            <td>Rp{{number_format($product->capital_price, 0, ',', '.')}}</td>
-                            <td>Rp{{number_format($product->price, 0, ',', '.')}}</td>
-                            <td>{{$product->stock}}</td>
+                            <td>{{$expense->date}}</td>
+                            <td>Rp{{number_format($expense->price, 0, ',', '.')}}</td>
+                            <td>{{$expense->description}}</td>
                             <td>
                                 <button type="button"
                                         class="btn btn-primary"
                                         data-toggle="modal"
                                         data-target="#updateModal"
-                                        data-id="{{$product->id}}"
-                                        data-name="{{$product->name}}"
-                                        data-price="{{$product->price}}"
-                                        data-capital="{{$product->capital_price}}"
-                                        data-stock="{{$product->stock}}">
+                                        data-id="{{$expense->id}}"
+                                        data-date="{{$expense->date}}"
+                                        data-price="{{$expense->price}}"
+                                        data-description="{{$expense->description}}">
                                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Ubah
                                 </button>
                                 <button type="button"
                                         class="btn btn-danger"
                                         data-toggle="modal"
                                         data-target="#deleteModal"
-                                        data-id="{{$product->id}}"
-                                        data-name="{{$product->name}}"
-                                        data-price="{{$product->price}}"
-                                        data-capital="{{$product->capital_price}}"
-                                        data-stock="{{$product->stock}}">
+                                        data-id="{{$expense->id}}"
+                                        data-date="{{$expense->date}}"
+                                        data-price="{{$expense->price}}"
+                                        data-description="{{$expense->description}}">
                                     <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Hapus
                                 </button>
                             </td>
@@ -79,7 +72,7 @@
         </div>
     </div>
 
-    <form class="form-horizontal" action="{{url('/product/delete')}}" method="post">
+    <form class="form-horizontal" action="{{url('expense/delete')}}" method="post">
         <div id="deleteModal" class="modal fade" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-sm">
                 <div class="modal-content">
@@ -91,23 +84,19 @@
                     <div class="modal-body">
                         <p class="text-danger">Anda akan menghapus barang berikut</p>
                         <div class="form-group">
-                            <label class="col-md-5 control-label">Nama</label>
-                            <label id="item-name" class="col-md-7 form-control-static">Name</label>
+                            <label class="col-md-5 control-label">Tanggal</label>
+                            <label id="item-date" class="col-md-7 form-control-static">Name</label>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-5 control-label">Harga Jual</label>
+                            <label class="col-md-5 control-label">Jumlah</label>
                             <label id="item-price" class="col-md-7 form-control-static">Price</label>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-5 control-label">Modal</label>
-                            <label id="item-capital-price" class="col-md-7 form-control-static">Modal</label>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-5 control-label">Stok</label>
-                            <label id="item-stock" class="col-md-7 form-control-static">Stock</label>
+                            <label class="col-md-5 control-label">Deskripsi</label>
+                            <label id="item-description" class="col-md-7 form-control-static">Deskripsi</label>
                         </div>
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <input type="hidden" id="item-id" name="product_id" value="">
+                        <input type="hidden" id="item-id" name="id" value="">
                         {{--<input id="add-transaction-btn" type="button" class="btn btn-primary" value="Record">--}}
                     </div>
                     <div class="modal-footer">
@@ -119,46 +108,39 @@
         </div><!-- /.modal -->
     </form>
 
-    <form class="form-horizontal" action="{{url('/product/update')}}" method="post">
+    <form class="form-horizontal" action="{{url('/expense/update')}}" method="post">
         <div id="updateModal" class="modal fade" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-sm">
+            <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header bg-primary">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                                     aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title">Pengubahan Produk</h4>
+                        <h4 class="modal-title">Pengubahan Pengeluaran</h4>
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label for="item-name" class="col-sm-5 control-label">Nama</label>
+                            <label for="item-date" class="col-sm-3 control-label">Tanggal</label>
                             <div class="col-sm-7">
-                                <input type="text" class="form-control" id="item-name" name="product_name" placeholder="Nama"
+                                <input type="date" class="form-control" id="item-date" name="date" placeholder="Tanggal"
                                        value="" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="item-price" class="col-sm-5 control-label">Harga Jual</label>
+                            <label for="item-price" class="col-sm-3 control-label">Jumlah</label>
                             <div class="col-sm-7">
-                                <input type="number" class="form-control" id="item-price" name="product_price" placeholder="Harga Jual"
+                                <input type="number" class="form-control" id="item-price" name="price" placeholder="Jumlah"
                                        value="" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="item-capital-price" class="col-sm-5 control-label">Modal</label>
+                            <label for="item-capital-price" class="col-sm-3 control-label">Deskripsi</label>
                             <div class="col-sm-7">
-                                <input type="number" class="form-control" id="item-capital-price" name="product_capital_price" placeholder="Modal"
-                                       value="" required>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="item-stock" class="col-sm-5 control-label">Stok</label>
-                            <div class="col-sm-7">
-                                <input type="number" class="form-control" id="item-stock" name="product_stock" placeholder="Stok"
+                                <input type="text" class="form-control" id="item-description" name="description" placeholder="Deskripsi"
                                        value="" required>
                             </div>
                         </div>
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <input type="hidden" id="item-id" name="product_id" value="">
+                        <input type="hidden" id="item-id" name="id" value="">
                         {{--<input id="add-transaction-btn" type="button" class="btn btn-primary" value="Record">--}}
                     </div>
                     <div class="modal-footer">
@@ -171,8 +153,9 @@
             </div><!-- /.modal-dialog -->
         </div><!-- /.modal -->
     </form>
+
 @endsection
 
 @section('js')
-    <script type="application/javascript" src="/js/product.admin.js"></script>
+    <script type="application/javascript" src="/js/expense.admin.js"></script>
 @endsection

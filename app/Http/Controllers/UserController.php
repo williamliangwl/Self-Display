@@ -26,7 +26,7 @@ class UserController extends Controller
     public function getAll()
     {
         if (Auth::user()) {
-            $users = User::all();
+            $users = User::where('is_active',true)->get();
 
             if (Auth::user()->role == Constants::ROLE_ADMIN) {
                 return view('user.admin.index', ['users' => $users]);
@@ -48,7 +48,7 @@ class UserController extends Controller
         $username = $request['username'];
         $password = $request['password'];
 
-        if (Auth::attempt(['username' => $username, 'password' => $password])) {
+        if (Auth::attempt(['username' => $username, 'password' => $password, 'is_active' => true])) {
             return redirect('/');
         } else {
             return redirect('/')->with('message','Username atau password salah');
@@ -80,7 +80,8 @@ class UserController extends Controller
                 'name' => $name,
                 'username' => $username,
                 'password' => bcrypt($password),
-                'role' => $role
+                'role' => $role,
+                'is_active' => true
             ]);
 
             return redirect('/user');
@@ -132,9 +133,9 @@ class UserController extends Controller
             try {
                 DB::beginTransaction();
 
-                $id = $request['id'];
-
-                User::destroy($id);
+                $user = User::find($request['id']);
+                $user->is_active = false;
+                $user->save();
 
                 DB::commit();
 

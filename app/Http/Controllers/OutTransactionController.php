@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Constants;
+use App\Http\Models\Buyer;
 use App\Http\Models\OutDetailTransaction;
 use App\Http\Models\Product;
 use App\Http\Models\OutTransaction;
 use App\Http\Models\User;
+use Carbon\Carbon;
 use PDF;
 use Illuminate\Http\Request;
 
@@ -29,7 +31,7 @@ class OutTransactionController extends Controller
                     return view('transaction.out.admin.index', ['transactions' => $outTransactions]);
                     break;
                 case Constants::ROLE_BRANCH:
-                    $products = Product::where('stock','>',0)->get();
+                    $products = Product::where('stock', '>', 0)->where('is_active', true)->orderBy('name')->get();
                     return view('transaction.out.branch.index', ['products' => $products]);
                     break;
             }
@@ -46,6 +48,21 @@ class OutTransactionController extends Controller
             return redirect('/');
     }
 
+    public function getBuyerTransaction(Request $request)
+    {
+        $outTransactions = [];
+        $buyer = null;
+        if (Auth::user() && isset($request['phone'])) {
+            $buyer = Buyer::where('phone', $request['phone'])->first();
+            if ($buyer != null)
+                $outTransactions = collect($this->getOutTransactions('', '', $buyer->id))->groupBy(function($item){
+                    return Carbon::parse($item['transaction_date'])->format('d-F-y');
+                });
+        }
+        return view('transaction.out.branch.find', ['transactions' => $outTransactions, 'buyer' => $buyer]);
+//        return $outTransactions;
+    }
+
     public function create(Request $request)
     {
         if (Auth::user()) {
@@ -56,7 +73,7 @@ class OutTransactionController extends Controller
                 $outTransaction = OutTransaction::create([
                     'user_id' => Auth::user()->id,
                     'date' => date('YmdHis'),
-                    'recipient' => $request['recipient']
+                    'buyer_id' => $request['buyer_id']
                 ]);
 
                 foreach ($request['items'] as $item) {
@@ -64,7 +81,7 @@ class OutTransactionController extends Controller
                         'transaction_id' => $outTransaction->id,
                         'product_id' => $item['id'],
                         'quantity' => $item['quantity'],
-                        'deal_price' => Product::find($item['id'])->price,
+                        'deal_price' => $item['price'],
                         'capital_price' => Product::find($item['id'])->capital_price,
                     ]);
 
@@ -92,9 +109,8 @@ class OutTransactionController extends Controller
     {
         if (Auth::user()) {
             $transaction = $this->getOutTransactions($transactionId);
-            return PDF::loadView('transaction.out.nota', ['transaction' => $transaction])->setPaper('a4', 'landscape')->stream('nota-'.$transactionId.'.pdf');
-        }
-        else
+            return PDF::loadView('transaction.out.nota', ['transaction' => $transaction])->setPaper('a4', 'landscape')->stream('nota-' . $transactionId . '.pdf');
+        } else
             return redirect('/');
     }
 
@@ -102,21 +118,21 @@ class OutTransactionController extends Controller
     {
         if (Auth::user()) {
             $transaction = $this->getOutTransactions($transactionId);
-            return PDF::loadView('transaction.out.nota', ['transaction' => $transaction])->setPaper('a4', 'landscape')->download('nota-'.$transactionId.'.pdf');
-        }
-        else
+            return PDF::loadView('transaction.out.nota', ['transaction' => $transaction])->setPaper('a4', 'landscape')->download('nota-' . $transactionId . '.pdf');
+        } else
             return redirect('/');
     }
 
-    private function getOutTransactions($id = '', $user_id = '')
+    private function getOutTransactions($id = '', $user_id = '', $buyer_id = '')
     {
         $outTransactions = OutTransaction::where('id', $id)->orderBy('date', 'desc')->get();
 
         if (empty($id))
             $outTransactions = OutTransaction::orderBy('date', 'desc')->get();
-
         if (!empty($user_id))
             $outTransactions = OutTransaction::where('user_id', $user_id)->orderBy('date', 'desc')->get();
+        if (!empty($buyer_id))
+            $outTransactions = OutTransaction::where('buyer_id', $buyer_id)->orderBy('date', 'desc')->get();
 
         $data = [];
 
@@ -124,16 +140,23 @@ class OutTransactionController extends Controller
             $tempData = [];
             $tempData['transaction_id'] = $outTransaction->id;
             $tempData['transaction_date'] = $outTransaction->date;
-            $tempData['transaction_recipient'] = $outTransaction->recipient;
             $tempData['transaction_user_name'] = User::find($outTransaction->user_id)->name;
             $tempData['transaction_total'] = 0;
             $tempData['transaction_total_text'] = '';
             $tempData['transaction_details'] = [];
+            $tempData['transaction_recipient'] = '';
+
+            $buyer = Buyer::where('id', $outTransaction->buyer_id)->first();
+            if ($buyer != null) {
+                $tempData['transaction_recipient'] = $buyer->name . '
+' . $buyer->phone. '
+' . $buyer->address;
+            }
 
             $outTransactionDetails = OutDetailTransaction::where('transaction_id', $outTransaction->id)->get();
             foreach ($outTransactionDetails as $outTransactionDetail) {
                 $product = Product::find($outTransactionDetail->product_id);
-                $tempData['transaction_total'] += $product->price * $outTransactionDetail->quantity;
+                $tempData['transaction_total'] += $outTransactionDetail->deal_price * $outTransactionDetail->quantity;
                 array_push($tempData['transaction_details'], [
                     'product_name' => $product->name,
                     'product_price' => $outTransactionDetail->deal_price,
@@ -190,7 +213,7 @@ class OutTransactionController extends Controller
                         } else if ($divider2 == 10) {
                             if ($left2 == 1) {
                                 if ($left == 10)
-                                    $result .= " Sepuluh ";
+                                    $result .= "Sepuluh ";
                                 else if ($left == 11)
                                     $result .= "Sebelas ";
                                 else
