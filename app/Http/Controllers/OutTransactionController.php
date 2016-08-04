@@ -31,7 +31,7 @@ class OutTransactionController extends Controller
                     return view('transaction.out.admin.index', ['transactions' => $outTransactions]);
                     break;
                 case Constants::ROLE_BRANCH:
-                    $products = Product::where('stock', '>', 0)->where('is_active', true)->orderBy('name')->get();
+                    $products = Product::where('stock', '>', 0)->where('is_active', true)->where('user_id', Auth::user()->id)->orderBy('name')->get();
                     return view('transaction.out.branch.index', ['products' => $products]);
                     break;
             }

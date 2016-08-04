@@ -13,7 +13,8 @@
                 <h4>Pendapatan</h4>
                 <table class="table table-bordered">
                     <tr>
-                        <th>Nama</th>
+                        <th>Cabang</th>
+                        <th>Barang</th>
                         <th>Kuantitas</th>
                         <th>Penjualan</th>
                         <th>Modal Barang</th>
@@ -22,6 +23,7 @@
                     </tr>
                     @foreach($reportData['details'] as $data)
                         <tr>
+                            <td>{{$data['user_name']}}</td>
                             <td>{{$data['name']}}</td>
                             <td>{{$data['quantity']}}</td>
                             <td>Rp {{number_format($data['deal'], 0, ',', '.')}}</td>

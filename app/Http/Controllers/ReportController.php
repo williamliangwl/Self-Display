@@ -8,6 +8,7 @@ use App\Http\Models\Expense;
 use App\Http\Models\OutDetailTransaction;
 use App\Http\Models\OutTransaction;
 use App\Http\Models\Product;
+use App\Http\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -40,6 +41,7 @@ class ReportController extends Controller
 
                     array_push($reportData['details'], [
                         'name' => $product->name,
+                        'user_name' => User::find($product->user_id)->name,
                         'quantity' => $transactionDetail->quantity,
                         'deal' => $transactionDetail->deal_price,
                         'capital' => $transactionDetail->capital_price
@@ -117,7 +119,8 @@ class ReportController extends Controller
                 }
             }
 
-            $dates = collect(array_unique($dates))->values();
+            $dates = collect(array_unique($dates))->values()->toArray();
+            asort($dates);
 
             foreach ($dates as $date) {
                 $temp = [];

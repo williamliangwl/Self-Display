@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Constants;
 use App\Http\Models\Product;
+use App\Http\Models\User;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -21,10 +22,18 @@ class ProductController extends Controller
 
             switch (Auth::user()->role) {
                 case Constants::ROLE_ADMIN:
-                    return view('product.admin.index', ['products' => $products]);
+                    $users = User::where('role', Constants::ROLE_BRANCH)->where('is_active', true)->select('id', 'name')->get();
+                    $products = $products->groupBy('user_id');
+                    $productMap = [];
+                    foreach ($products as $userId => $productList) {
+                        if ($users->find($userId) != null)
+                            $productMap[$users->find($userId)->name] = $productList;
+                    }
+
+                    return view('product.admin.index', ['productMap' => $productMap, 'users' => $users]);
                     break;
                 case Constants::ROLE_BRANCH:
-                    return view('product.branch.index', ['products' => $products]);
+                    return view('product.branch.index', ['products' => $products::where('user_id', Auth::user()->id)->get()]);
                     break;
                 default:
                     abort(403);
@@ -37,9 +46,12 @@ class ProductController extends Controller
 
     public function getAll()
     {
-        if (Auth::user())
-            return Product::where('is_active',true)->orderBy('name')->get();
-        else
+        if (Auth::user()) {
+            if (Auth::user()->role == Constants::ROLE_ADMIN)
+                return Product::where('is_active', true)->orderBy('name')->get();
+            else
+                return Product::where('is_active', true)->where('user_id', Auth::user()->id)->orderBy('name')->get();
+        } else
             return '';
     }
 
@@ -50,13 +62,16 @@ class ProductController extends Controller
 
                 DB::beginTransaction();
 
-                $product = Product::create([
-                    'name' => $request['name'],
-                    'capital_price' => $request['capital_price'],
-                    'stock' => $request['stock'],
-                    'price' => $request['price'],
-                    'is_active' => true
-                ]);
+                foreach ($request['user_ids'] as $user_id) {
+                    $product = Product::create([
+                        'name' => $request['name'],
+                        'capital_price' => $request['capital_price'],
+                        'stock' => $request['stock'],
+                        'price' => $request['price'],
+                        'is_active' => true,
+                        'user_id' => $user_id
+                    ]);
+                }
 
                 DB::commit();
 

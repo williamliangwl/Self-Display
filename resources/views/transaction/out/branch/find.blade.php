@@ -27,7 +27,7 @@
                         <div class="panel panel-primary">
                             <div class="panel-heading" role="tab" id="headingOne">
                                 <h3 class="panel-title">
-                                    <a href="#{{$date}}" role="button" data-toggle="collapse" data-parent="#accordion"
+                                    <a href="#{{$date}}" role="button" data-toggle="collapse"
                                        aria-expanded="true" aria-controls="{{$date}}">
                                         Tanggal {{$date}}
                                     </a>

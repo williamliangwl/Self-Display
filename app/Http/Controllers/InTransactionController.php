@@ -72,8 +72,8 @@ class InTransactionController extends Controller
                     'date' => date('YmdHis')
                 ]);
 
-                if (empty($request['id']))
-                    $product = Product::where('name', $request['name'])->first();
+                if (!isset($request['id']) || empty($request['id']))
+                    $product = Product::where('name', $request['name'])->where('user_id', Auth::user()->id)->first();
                 else
                     $product = Product::find($request['id']);
 
