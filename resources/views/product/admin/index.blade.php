@@ -49,14 +49,14 @@
                         <div class="panel panel-primary">
                             <div class="panel-heading" role="tab" id="headingOne">
                                 <h3 class="panel-title">
-                                    <a href="#{{$userName}}" role="button" data-toggle="collapse"
-                                       aria-expanded="true" aria-controls="{{$userName}}">
+                                    <a href="#{{str_replace(' ', '-',$userName)}}" role="button" data-toggle="collapse"
+                                       aria-expanded="true" aria-controls="{{str_replace(' ', '-',$userName)}}">
                                         {{$userName}}
                                     </a>
                                 </h3>
 
                             </div>
-                            <div id="{{$userName}}" class="panel-collapse collapse in" role="tabpanel">
+                            <div id="{{str_replace(' ', '-',$userName)}}" class="panel-collapse collapse in" role="tabpanel">
                                 <div class="panel-body">
                                     <table class="table">
                                         <tr>
