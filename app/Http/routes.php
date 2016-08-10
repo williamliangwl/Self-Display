@@ -33,21 +33,26 @@ Route::post('/product/delete', 'ProductController@delete');
 Route::post('/product/update', 'ProductController@update');
 
 Route::get('/transaction/in', 'InTransactionController@getAll');
+Route::get('/transaction/in/previous', 'InTransactionController@getPrevious');
 Route::post('/transaction/in/create', 'InTransactionController@create');
+Route::post('/transaction/in/delete', 'InTransactionController@delete');
 
 Route::get('/transaction/out', 'OutTransactionController@getAll');
 Route::get('/transaction/out/previous', 'OutTransactionController@getPrevious');
 Route::post('/transaction/out/create', 'OutTransactionController@create');
+Route::post('/transaction/out/delete', 'OutTransactionController@delete');
 Route::get('/transaction/out/buyer', function(){
     return view('transaction.out.branch.find');
 });
-Route::post('/transaction/out/buyer/', 'OutTransactionController@getBuyerTransaction');
+Route::get('/transaction/out/buyer/check/{buyerId}', 'OutTransactionController@getBuyerTransaction');
 
 Route::get('/transaction/out/report/{transactionId}', 'OutTransactionController@showReport');
 Route::get('/transaction/out/report/{transactionId}/download', 'OutTransactionController@downloadReport');
 
 Route::get('/report/daily', 'ReportController@dailyReport');
 Route::get('/report/weekly', 'ReportController@weeklyReport');
+Route::get('/report/weekly/{userId}/download', 'ReportController@downloadWeeklyReport');
+Route::get('/report/weekly/download', 'ReportController@selectWeeklyReport');
 
 Route::get('/expense', 'ExpenseController@index');
 Route::post('/expense/create', 'ExpenseController@create');
@@ -60,4 +65,5 @@ Route::post('/cash-expense/delete', 'CashExpenseController@delete');
 Route::post('/cash-expense/update', 'CashExpenseController@update');
 
 Route::post('/buyer/get', 'BuyerController@get');
+Route::post('/buyer/getAll', 'BuyerController@getAll');
 Route::post('/buyer/create', 'BuyerController@create');

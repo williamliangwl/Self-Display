@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Constants;
 use App\Http\Models\CashExpense;
+use App\Http\Models\User;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -15,10 +16,26 @@ class CashExpenseController extends Controller
 {
     public function index()
     {
-        if (Auth::user() && Auth::user()->role == Constants::ROLE_ADMIN) {
-            $expenses = CashExpense::orderBy('date', 'desc')->get();
+        if (Auth::user()) {
 
-            return view('cash-expense.index', ['expenses' => $expenses]);
+            switch (Auth::user()->role) {
+                case Constants::ROLE_BRANCH:
+                    $expenses = CashExpense::where('user_id', Auth::user()->id)->orderBy('date', 'desc')->get();
+
+                    return view('cash-expense.branch.index', ['expenses' => $expenses]);
+                    break;
+                case Constants::ROLE_ADMIN:
+                    $expenses = CashExpense::orderBy('date', 'desc')->get()->groupBy('user_id');
+                    $expensesMap = [];
+
+                    foreach ($expenses as $userId => $expenseList) {
+                        $user = User::find($userId);
+                        $expensesMap[$user->name] = $expenseList;
+                    }
+
+                    return view('cash-expense.admin.index', ['expensesMap' => $expensesMap]);
+                    break;
+            }
 
         } else {
             return redirect('/');
@@ -27,7 +44,7 @@ class CashExpenseController extends Controller
 
     public function create(Request $request)
     {
-        if (Auth::user() && Auth::user()->role == Constants::ROLE_ADMIN) {
+        if (Auth::user()) {
             try {
 
                 DB::beginTransaction();
@@ -36,6 +53,7 @@ class CashExpenseController extends Controller
                     'date' => $request['date'],
                     'price' => $request['price'],
                     'description' => $request['description'],
+                    'user_id' => Auth::user()->id
                 ]);
 
                 DB::commit();
@@ -51,7 +69,7 @@ class CashExpenseController extends Controller
 
     public function delete(Request $request)
     {
-        if (Auth::user() && Auth::user()->role == Constants::ROLE_ADMIN) {
+        if (Auth::user()) {
             try {
                 DB::beginTransaction();
 
@@ -72,7 +90,7 @@ class CashExpenseController extends Controller
 
     public function update(Request $request)
     {
-        if (Auth::user() && Auth::user()->role == Constants::ROLE_ADMIN) {
+        if (Auth::user()) {
             try {
 
                 DB::beginTransaction();

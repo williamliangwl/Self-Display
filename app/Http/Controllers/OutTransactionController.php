@@ -48,18 +48,21 @@ class OutTransactionController extends Controller
             return redirect('/');
     }
 
-    public function getBuyerTransaction(Request $request)
+    public function getBuyerTransaction($buyerId)
     {
         $outTransactions = [];
         $buyer = null;
-        if (Auth::user() && isset($request['phone'])) {
-            $buyer = Buyer::where('phone', $request['phone'])->first();
-            if ($buyer != null)
-                $outTransactions = collect($this->getOutTransactions('', '', $buyer->id))->groupBy(function($item){
+        if (Auth::user() && $buyerId != null) {
+
+            $buyer = Buyer::find($buyerId);
+
+            if ($buyer != null) {
+                $outTransactions = collect($this->getOutTransactions('', '', $buyer->id))->groupBy(function ($item) {
                     return Carbon::parse($item['transaction_date'])->format('d-F-y');
                 });
+            }
         }
-        return view('transaction.out.branch.find', ['transactions' => $outTransactions, 'buyer' => $buyer]);
+        return view('transaction.out.branch.find-result', ['transactions' => $outTransactions, 'buyer' => $buyer]);
 //        return $outTransactions;
     }
 
@@ -95,6 +98,44 @@ class OutTransactionController extends Controller
                 DB::commit();
 
                 return $outTransaction->id;
+
+            } catch (\Exception $e) {
+                Log::info($e->getTraceAsString());
+                DB::rollback();
+                return $e->getMessage();
+            }
+        } else
+            abort(403);
+    }
+
+    public function delete(Request $request)
+    {
+        if (Auth::user()) {
+            try {
+
+                DB::beginTransaction();
+
+                $id = $request['id'];
+
+                $outTransaction = OutTransaction::find($id);
+                $outDetailTransactions = OutDetailTransaction::where('transaction_id', $outTransaction->id)->get();
+
+                foreach ($outDetailTransactions as $outDetailTransaction) {
+                    $product = Product::find($outDetailTransaction->product_id);
+                    if (!$product)
+                        throwException(new \Exception('Product not found or no stock available'));
+                    $product->stock += $outDetailTransaction->quantity;
+                    $product->save();
+                    OutDetailTransaction::destroy($outDetailTransaction->id);
+                }
+                OutTransaction::destroy($outTransaction->id);
+
+                DB::commit();
+
+                if (Auth::user()->role == Constants::ROLE_BRANCH)
+                    return redirect()->action('OutTransactionController@getPrevious');
+                else if (Auth::user()->role == Constants::ROLE_ADMIN)
+                    return redirect()->action('OutTransactionController@getAll');
 
             } catch (\Exception $e) {
                 Log::info($e->getTraceAsString());
@@ -149,7 +190,7 @@ class OutTransactionController extends Controller
             $buyer = Buyer::where('id', $outTransaction->buyer_id)->first();
             if ($buyer != null) {
                 $tempData['transaction_recipient'] = $buyer->name . '
-' . $buyer->phone. '
+' . $buyer->phone . '
 ' . $buyer->address;
             }
 

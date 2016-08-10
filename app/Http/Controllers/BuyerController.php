@@ -15,11 +15,32 @@ class BuyerController extends Controller
     public function get(Request $request)
     {
         if (Auth::user()) {
-            $phone = $request['phone'];
 
-            return Buyer::where('phone', $phone)->first();
-        }
-        else
+            $buyers = null;
+
+            if (!empty($request['name']) && !empty($request['phone']))
+                $buyers = Buyer::where('name', $request['name'])->where('phone', $request['phone'])->get();
+            else if (!empty($request['name']))
+                $buyers = Buyer::where('name', $request['name'])->get();
+            else if (!empty($request['phone']))
+                $buyers = Buyer::where('phone', $request['phone'])->get();
+
+
+            if ($buyers != null && $buyers->count() == 1)
+                return $buyers->first();
+            else
+                return null;
+        } else
+            abort(403);
+    }
+
+    public function getAll()
+    {
+        if (Auth::user()) {
+            $buyers = Buyer::all();
+
+            return $buyers;
+        } else
             abort(403);
     }
 
@@ -50,8 +71,7 @@ class BuyerController extends Controller
                 DB::rollback();
                 return $e->getMessage();
             }
-        }
-        else
+        } else
             abort(403);
     }
 }

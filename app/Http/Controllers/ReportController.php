@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use Auth;
+use PDF;
 
 class ReportController extends Controller
 {
@@ -22,44 +23,48 @@ class ReportController extends Controller
     {
         if (Auth::user() && Auth::user()->role == Constants::ROLE_ADMIN) {
 
-            $reportData = [];
-            $reportData['totalPenjualan'] = 0;
-            $reportData['totalModal'] = 0;
-            $reportData['totalExpenses'] = 0;
-            $reportData['details'] = [];
-            $transactions = OutTransaction::whereDate('date', '=', Carbon::today()->toDateString())->get();
+            $data = [];
+            $branches = User::where('role', Constants::ROLE_BRANCH)->where('is_active', true)->get();
+            foreach ($branches as $branch) {
 
-            foreach ($transactions as $transaction) {
-                $transactionDetails = OutDetailTransaction::where('transaction_id', $transaction->id)->get();
+                $reportData = [];
+                $reportData['totalPenjualan'] = 0;
+                $reportData['totalModal'] = 0;
+                $reportData['totalExpenses'] = 0;
+                $reportData['details'] = [];
+                $transactions = OutTransaction::whereDate('date', '=', Carbon::today()->toDateString())->where('user_id', $branch->id)->get();
 
-                foreach ($transactionDetails as $transactionDetail) {
+                foreach ($transactions as $transaction) {
+                    $transactionDetails = OutDetailTransaction::where('transaction_id', $transaction->id)->get();
 
-                    $product = Product::where('id', $transactionDetail->product_id)->first();
+                    foreach ($transactionDetails as $transactionDetail) {
 
-                    $reportData['totalPenjualan'] += $transactionDetail->deal_price * $transactionDetail->quantity;
-                    $reportData['totalModal'] += $transactionDetail->capital_price * $transactionDetail->quantity;
+                        $product = Product::where('id', $transactionDetail->product_id)->first();
 
-                    array_push($reportData['details'], [
-                        'name' => $product->name,
-                        'user_name' => User::find($product->user_id)->name,
-                        'quantity' => $transactionDetail->quantity,
-                        'deal' => $transactionDetail->deal_price,
-                        'capital' => $transactionDetail->capital_price
-                    ]);
+                        $reportData['totalPenjualan'] += $transactionDetail->deal_price * $transactionDetail->quantity;
+                        $reportData['totalModal'] += $transactionDetail->capital_price * $transactionDetail->quantity;
+
+                        array_push($reportData['details'], [
+                            'name' => $product->name,
+                            'quantity' => $transactionDetail->quantity,
+                            'deal' => $transactionDetail->deal_price,
+                            'capital' => $transactionDetail->capital_price
+                        ]);
+                    }
+
                 }
 
+                // Get Expenses
+                $expenses = Expense::whereDate('date', '=', Carbon::today()->toDateString())->where('user_id', $branch->id)->get();
+                foreach ($expenses as $expense) {
+                    $reportData['totalExpenses'] += $expense->price;
+                }
+                $reportData['expenses'] = $expenses;
+
+                $data[$branch->name] = $reportData;
             }
 
-            // Get Expenses
-            $expenses = Expense::whereDate('date', '=', Carbon::today()->toDateString())->get();
-            foreach ($expenses as $expense) {
-                $reportData['totalExpenses'] += $expense->price;
-            }
-            $reportData['expenses'] = $expenses;
-
-            return view('report.daily', ['reportData' => $reportData]);
-
-
+            return view('report.daily', ['data' => $data]);
         } else
             redirect('/');
     }
@@ -67,163 +72,230 @@ class ReportController extends Controller
     public function weeklyReport()
     {
         if (Auth::user() && Auth::user()->role == Constants::ROLE_ADMIN) {
-            $reportData = [];
-            $reportData['totalPenjualan'] = 0;
-            $reportData['totalModal'] = 0;
-            $reportData['totalPengeluaran'] = 0;
-            $reportData['totalPendapatan'] = 0;
-            $reportData['totalPengeluaranCash'] = 0;
-            $reportData['details'] = [];
-            $weekNumber = Carbon::today()->weekOfYear;
-            $weeklyTransactions = OutTransaction::orderBy('date')->get()->groupBy(function ($item) {
-                return Carbon::parse($item->date)->weekOfYear;
-            });
 
-            $weeklyExpenses = Expense::orderBy('date')->get()->groupBy(function ($item) {
-                return Carbon::parse($item->date)->weekOfYear;
-            });
+            $data = [];
+            $branches = User::where('role', Constants::ROLE_BRANCH)->where('is_active', true)->get();
+            foreach ($branches as $branch) {
 
-            $weeklyCashExpenses = CashExpense::orderBy('date')->get()->groupBy(function ($item) {
-                return Carbon::parse($item->date)->weekOfYear;
-            });
-
-            $dates = [];
-            $dailyTransactions = [];
-            $dailyExpenses = [];
-            $dailyCashExpenses = [];
-
-            if (isset($weeklyTransactions[$weekNumber])) {
-                $dailyTransactions = collect($weeklyTransactions[$weekNumber])->groupBy(function ($item) {
-                    return Carbon::parse($item->date)->toDateString();
+                $reportData = [];
+                $reportData['totalPenjualan'] = 0;
+                $reportData['totalModal'] = 0;
+                $reportData['totalPengeluaran'] = 0;
+                $reportData['totalPendapatan'] = 0;
+                $reportData['totalPengeluaranCash'] = 0;
+                $reportData['details'] = [];
+                $weekNumber = Carbon::today()->weekOfYear;
+                $weeklyTransactions = OutTransaction::where('user_id', $branch->id)->orderBy('date')->get()->groupBy(function ($item) {
+                    return Carbon::parse($item->date)->weekOfYear;
                 });
-                foreach ($dailyTransactions as $date => $dailyTransaction) {
-                    array_push($dates, $date);
-                }
-            }
 
-            if (isset($weeklyExpenses[$weekNumber])) {
-                $dailyExpenses = collect($weeklyExpenses[$weekNumber])->groupBy(function ($item) {
-                    return Carbon::parse($item->date)->toDateString();
+                $weeklyExpenses = Expense::where('user_id', $branch->id)->orderBy('date')->get()->groupBy(function ($item) {
+                    return Carbon::parse($item->date)->weekOfYear;
                 });
-                foreach ($dailyExpenses as $date => $dailyExpense) {
-                    array_push($dates, $date);
-                }
-            }
 
-            if (isset($weeklyCashExpenses[$weekNumber])) {
-                $dailyCashExpenses = collect($weeklyCashExpenses[$weekNumber])->groupBy(function ($item) {
-                    return Carbon::parse($item->date)->toDateString();
+                $weeklyCashExpenses = CashExpense::where('user_id', $branch->id)->orderBy('date')->get()->groupBy(function ($item) {
+                    return Carbon::parse($item->date)->weekOfYear;
                 });
-                foreach ($dailyCashExpenses as $date => $dailyCashExpense) {
-                    array_push($dates, $date);
-                }
-            }
 
-            $dates = collect(array_unique($dates))->values()->toArray();
-            asort($dates);
+                $dates = [];
+                $dailyTransactions = [];
+                $dailyExpenses = [];
+                $dailyCashExpenses = [];
 
-            foreach ($dates as $date) {
-                $temp = [];
-                $temp['totalPenjualan'] = 0;
-                $temp['totalModal'] = 0;
-                $temp['totalPengeluaran'] = 0;
-                $temp['totalPengeluaranCash'] = 0;
-                $temp['date'] = Carbon::parse($date)->format('d M Y');
-
-                if (isset($dailyExpenses[$date])) {
-                    $temp['totalPengeluaran'] = collect($dailyExpenses[$date])->sum('price');
-                    $reportData['totalPengeluaran'] += collect($dailyExpenses[$date])->sum('price');
-                }
-
-                if (isset($dailyCashExpenses[$date])) {
-                    $temp['totalPengeluaranCash'] = collect($dailyCashExpenses[$date])->sum('price');
-                    $reportData['totalPengeluaranCash'] += collect($dailyCashExpenses[$date])->sum('price');
-                }
-
-                if (isset($dailyTransactions[$date])) {
-                    foreach ($dailyTransactions[$date] as $transaction) {
-                        $transactionDetails = OutDetailTransaction::where('transaction_id', $transaction->id)->get();
-                        foreach ($transactionDetails as $transactionDetail) {
-
-                            $temp['totalPenjualan'] += $transactionDetail->deal_price * $transactionDetail->quantity;
-                            $temp['totalModal'] += $transactionDetail->capital_price * $transactionDetail->quantity;
-
-                            $reportData['totalPenjualan'] += $transactionDetail->deal_price * $transactionDetail->quantity;
-                            $reportData['totalModal'] += $transactionDetail->capital_price * $transactionDetail->quantity;
-
-                        }
+                if (isset($weeklyTransactions[$weekNumber])) {
+                    $dailyTransactions = collect($weeklyTransactions[$weekNumber])->groupBy(function ($item) {
+                        return Carbon::parse($item->date)->toDateString();
+                    });
+                    foreach ($dailyTransactions as $date => $dailyTransaction) {
+                        array_push($dates, $date);
                     }
                 }
 
-                array_push($reportData['details'], $temp);
+                if (isset($weeklyExpenses[$weekNumber])) {
+                    $dailyExpenses = collect($weeklyExpenses[$weekNumber])->groupBy(function ($item) {
+                        return Carbon::parse($item->date)->toDateString();
+                    });
+                    foreach ($dailyExpenses as $date => $dailyExpense) {
+                        array_push($dates, $date);
+                    }
+                }
 
+                if (isset($weeklyCashExpenses[$weekNumber])) {
+                    $dailyCashExpenses = collect($weeklyCashExpenses[$weekNumber])->groupBy(function ($item) {
+                        return Carbon::parse($item->date)->toDateString();
+                    });
+                    foreach ($dailyCashExpenses as $date => $dailyCashExpense) {
+                        array_push($dates, $date);
+                    }
+                }
+
+                $dates = collect(array_unique($dates))->values()->toArray();
+                asort($dates);
+
+                foreach ($dates as $date) {
+                    $temp = [];
+                    $temp['totalPenjualan'] = 0;
+                    $temp['totalModal'] = 0;
+                    $temp['totalPengeluaran'] = 0;
+                    $temp['totalPengeluaranCash'] = 0;
+                    $temp['date'] = Carbon::parse($date)->format('d M Y');
+
+                    if (isset($dailyExpenses[$date])) {
+                        $temp['totalPengeluaran'] = collect($dailyExpenses[$date])->sum('price');
+                        $reportData['totalPengeluaran'] += collect($dailyExpenses[$date])->sum('price');
+                    }
+
+                    if (isset($dailyCashExpenses[$date])) {
+                        $temp['totalPengeluaranCash'] = collect($dailyCashExpenses[$date])->sum('price');
+                        $reportData['totalPengeluaranCash'] += collect($dailyCashExpenses[$date])->sum('price');
+                    }
+
+                    if (isset($dailyTransactions[$date])) {
+                        foreach ($dailyTransactions[$date] as $transaction) {
+                            $transactionDetails = OutDetailTransaction::where('transaction_id', $transaction->id)->get();
+                            foreach ($transactionDetails as $transactionDetail) {
+
+                                $temp['totalPenjualan'] += $transactionDetail->deal_price * $transactionDetail->quantity;
+                                $temp['totalModal'] += $transactionDetail->capital_price * $transactionDetail->quantity;
+
+                                $reportData['totalPenjualan'] += $transactionDetail->deal_price * $transactionDetail->quantity;
+                                $reportData['totalModal'] += $transactionDetail->capital_price * $transactionDetail->quantity;
+
+                            }
+                        }
+                    }
+
+                    array_push($reportData['details'], $temp);
+                }
+                $data[$branch->name] = $reportData;
             }
 
-            return view('report.weekly', ['reportData' => $reportData]);
+            return view('report.weekly', ['data' => $data]);
 
         } else redirect('/');
     }
 
-    public
-    function monthlyReport()
+    public function selectWeeklyReport()
+    {
+        if (Auth::user() && Auth::user()->role == Constants::ROLE_ADMIN) {
+            $users = User::where('role', Constants::ROLE_BRANCH)->where('is_active', true)->get();
+            return view('report.weekly-select', ['users' => $users]);
+        }
+    }
+
+    public function downloadWeeklyReport($userId)
     {
         if (Auth::user() && Auth::user()->role == Constants::ROLE_ADMIN) {
 
-            $reportData = [];
-            $months = [];
-            $transactions = OutTransaction::orderBy('date', 'desc')->get();
+//            $weekNumber = Carbon::today()->weekOfYear;
+            $data = [];
+            $weeklyTransactions = OutTransaction::where('user_id', $userId)->orderBy('date')->get()->groupBy(function ($item) {
+                return Carbon::parse($item->date)->weekOfYear;
+            });
 
-            foreach ($transactions as $transaction) {
-                $month = Carbon::parse($transaction->date)->month;
-                if (!in_array($month, $months)) {
-                    array_push($months, $month);
-                }
-            }
+            $weeklyExpenses = Expense::where('user_id', $userId)->orderBy('date')->get()->groupBy(function ($item) {
+                return Carbon::parse($item->date)->weekOfYear;
+            });
 
-            foreach ($months as $month) {
-                $data = [];
-                $data['month'] = $month;
-                $data['details'] = [];
+            $weeklyCashExpenses = CashExpense::where('user_id', $userId)->orderBy('date')->get()->groupBy(function ($item) {
+                return Carbon::parse($item->date)->weekOfYear;
+            });
 
-                foreach ($transactions as $transaction) {
-                    $transactionDate = Carbon::parse($transaction->date);
-                    $transactionDetails = OutDetailTransaction::where('transaction_id', $transaction->id)->get();
+            $weekNumbers = array_unique(collect(collect($weeklyCashExpenses->keys())->merge($weeklyTransactions->keys()))->merge($weeklyExpenses->keys())->values()->all());
 
-                    if ($transactionDate->month == $month) {
-                        $found = false;
-                        if (!empty($data['details'])) {
-                            foreach ($data['details'] as $key => $value) {
-                                if ($data['details'][$key]['date'] == $transactionDate->toFormattedDateString()) {
-                                    foreach ($transactionDetails as $transactionDetail) {
-                                        $data['details'][$key]['capital'] += $transactionDetail['capital_price'] * $transactionDetail['quantity'];
-                                        $data['details'][$key]['deal'] += $transactionDetail['deal_price'] * $transactionDetail['quantity'];
-                                    }
-                                    $found = true;
-                                }
-                            }
-                        }
+            foreach ($weekNumbers as $weekNumber) {
 
-                        if (!$found) {
-                            $temp = [];
-                            $temp['date'] = $transactionDate->toFormattedDateString();
-                            $temp['capital'] = 0;
-                            $temp['deal'] = 0;
+                $reportData = [];
+                $reportData['totalPenjualan'] = 0;
+                $reportData['totalModal'] = 0;
+                $reportData['totalPengeluaran'] = 0;
+                $reportData['totalPendapatan'] = 0;
+                $reportData['totalPengeluaranCash'] = 0;
+                $reportData['details'] = [];
 
-                            foreach ($transactionDetails as $transactionDetail) {
-                                $temp['capital'] += $transactionDetail['capital_price'] * $transactionDetail['quantity'];
-                                $temp['deal'] += $transactionDetail['deal_price'] * $transactionDetail['quantity'];
-                            }
 
-                            array_push($data['details'], $temp);
-                        }
+                $dates = [];
+                $dailyTransactions = [];
+                $dailyExpenses = [];
+                $dailyCashExpenses = [];
+
+                if (isset($weeklyTransactions[$weekNumber])) {
+                    $dailyTransactions = collect($weeklyTransactions[$weekNumber])->groupBy(function ($item) {
+                        return Carbon::parse($item->date)->toDateString();
+                    });
+                    foreach ($dailyTransactions as $date => $dailyTransaction) {
+                        array_push($dates, $date);
                     }
                 }
 
-                array_push($reportData, $data);
+                if (isset($weeklyExpenses[$weekNumber])) {
+                    $dailyExpenses = collect($weeklyExpenses[$weekNumber])->groupBy(function ($item) {
+                        return Carbon::parse($item->date)->toDateString();
+                    });
+                    foreach ($dailyExpenses as $date => $dailyExpense) {
+                        array_push($dates, $date);
+                    }
+                }
+
+                if (isset($weeklyCashExpenses[$weekNumber])) {
+                    $dailyCashExpenses = collect($weeklyCashExpenses[$weekNumber])->groupBy(function ($item) {
+                        return Carbon::parse($item->date)->toDateString();
+                    });
+                    foreach ($dailyCashExpenses as $date => $dailyCashExpense) {
+                        array_push($dates, $date);
+                    }
+                }
+
+                $dates = collect(array_unique($dates))->values()->toArray();
+                asort($dates);
+
+                foreach ($dates as $date) {
+                    $temp = [];
+                    $temp['totalPenjualan'] = 0;
+                    $temp['totalModal'] = 0;
+                    $temp['totalPengeluaran'] = 0;
+                    $temp['totalPengeluaranCash'] = 0;
+                    $temp['date'] = Carbon::parse($date)->format('d M Y');
+
+                    if (isset($dailyExpenses[$date])) {
+                        $temp['totalPengeluaran'] = collect($dailyExpenses[$date])->sum('price');
+                        $reportData['totalPengeluaran'] += collect($dailyExpenses[$date])->sum('price');
+                    }
+
+                    if (isset($dailyCashExpenses[$date])) {
+                        $temp['totalPengeluaranCash'] = collect($dailyCashExpenses[$date])->sum('price');
+                        $reportData['totalPengeluaranCash'] += collect($dailyCashExpenses[$date])->sum('price');
+                    }
+
+                    if (isset($dailyTransactions[$date])) {
+                        foreach ($dailyTransactions[$date] as $transaction) {
+                            $transactionDetails = OutDetailTransaction::where('transaction_id', $transaction->id)->get();
+                            foreach ($transactionDetails as $transactionDetail) {
+
+                                $temp['totalPenjualan'] += $transactionDetail->deal_price * $transactionDetail->quantity;
+                                $temp['totalModal'] += $transactionDetail->capital_price * $transactionDetail->quantity;
+
+                                $reportData['totalPenjualan'] += $transactionDetail->deal_price * $transactionDetail->quantity;
+                                $reportData['totalModal'] += $transactionDetail->capital_price * $transactionDetail->quantity;
+
+                            }
+                        }
+                    }
+
+                    array_push($reportData['details'], $temp);
+                }
+
+                $data[$weekNumber] = $reportData;
             }
 
-            return view('report.monthly', ['reportData' => $reportData]);
+            krsort($data);
+
+            $user = User::find($userId);
+
+//            return view('report.weekly-download', ['data'=>$data, 'user' => $user]);
+            return PDF::loadView('report.weekly-download', ['data'=>$data, 'user' => $user])->setPaper('a4', 'portrait')->download('laporan-mingguan-' . $user->name . '.pdf');
+
         } else
-            abort(403);
+            redirect('/');
     }
 }

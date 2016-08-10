@@ -22,36 +22,24 @@ class InTransactionController extends Controller
         if (Auth::user()) {
             switch (Auth::user()->role) {
                 case Constants::ROLE_ADMIN:
-                    $inTransactions = InTransaction::orderBy('date', 'desc')->get();
-                    $data = [];
-
-                    foreach ($inTransactions as $inTransaction) {
-                        $tempData = [];
-                        $tempData['transaction_id'] = $inTransaction->id;
-                        $tempData['transaction_date'] = $inTransaction->date;
-                        $tempData['transaction_user_name'] = User::find($inTransaction->user_id)->name;
-                        $tempData['transaction_details'] = [];
-
-                        $inTransactionDetails = InDetailTransaction::where('transaction_id', $inTransaction->id)->get();
-                        foreach ($inTransactionDetails as $inTransactionDetail) {
-                            $product = Product::find($inTransactionDetail->product_id);
-                            array_push($tempData['transaction_details'], [
-                                'product_name' => $product->name,
-                                'product_quantity' => $inTransactionDetail->quantity,]);
-                        }
-
-                        array_push($data, $tempData);
-                    }
-
-                    return view('transaction.in.admin.index', ['transactions' => $data]);
+                    $transactions = $this->getInTransactions();
+                    return view('transaction.in.admin.index', ['transactions' => $transactions]);
                     break;
                 case Constants::ROLE_BRANCH:
-                    $products = Product::where('is_active',true)->orderBy('name')->get();
+                    $products = Product::where('is_active', true)->orderBy('name')->get();
                     return view('transaction.in.branch.index', ['products' => $products]);
                     break;
             }
-        }
-        else
+        } else
+            return redirect('/');
+    }
+
+    public function getPrevious()
+    {
+        if (Auth::user()) {
+            $inTransactions = $this->getInTransactions(Auth::user()->id);
+            return view('transaction.in.branch.previous', ['transactions' => $inTransactions]);
+        } else
             return redirect('/');
     }
 
@@ -99,8 +87,76 @@ class InTransactionController extends Controller
                 DB::rollback();
                 return $e->getMessage();
             }
-        }
-        else
+        } else
             abort(403);
+    }
+
+    public function delete(Request $request)
+    {
+        if (Auth::user()) {
+            try {
+
+                DB::beginTransaction();
+
+                $id = $request['id'];
+
+                $inTransaction = InTransaction::find($id);
+                $inDetailTransactions = InDetailTransaction::where('transaction_id', $inTransaction->id)->get();
+
+                foreach ($inDetailTransactions as $inDetailTransaction) {
+                    $product = Product::find($inDetailTransaction->product_id);
+                    if (!$product)
+                        throwException(new \Exception('Product not found or no stock available'));
+                    $product->stock -= $inDetailTransaction->quantity;
+                    $product->save();
+                    InDetailTransaction::destroy($inDetailTransaction->id);
+                }
+                InTransaction::destroy($inTransaction->id);
+
+                DB::commit();
+
+                if (Auth::user()->role == Constants::ROLE_BRANCH)
+                    return redirect()->action('InTransactionController@getPrevious');
+                else if (Auth::user()->role == Constants::ROLE_ADMIN)
+                    return redirect()->action('InTransactionController@getAll');
+
+
+            } catch (\Exception $e) {
+                Log::info($e->getTraceAsString());
+                DB::rollback();
+                return $e->getMessage();
+            }
+        } else
+            abort(403);
+    }
+
+    public function getInTransactions($user_id = '')
+    {
+        $inTransactions = InTransaction::orderBy('date', 'desc')->get();
+
+        if (!empty($user_id))
+            $inTransactions = InTransaction::where('user_id', $user_id)->orderBy('date', 'desc')->get();
+
+        $data = [];
+
+        foreach ($inTransactions as $inTransaction) {
+            $tempData = [];
+            $tempData['transaction_id'] = $inTransaction->id;
+            $tempData['transaction_date'] = $inTransaction->date;
+            $tempData['transaction_user_name'] = User::find($inTransaction->user_id)->name;
+            $tempData['transaction_details'] = [];
+
+            $inTransactionDetails = InDetailTransaction::where('transaction_id', $inTransaction->id)->get();
+            foreach ($inTransactionDetails as $inTransactionDetail) {
+                $product = Product::find($inTransactionDetail->product_id);
+                array_push($tempData['transaction_details'], [
+                    'product_name' => $product->name,
+                    'product_quantity' => $inTransactionDetail->quantity,]);
+            }
+
+            array_push($data, $tempData);
+        }
+
+        return $data;
     }
 }

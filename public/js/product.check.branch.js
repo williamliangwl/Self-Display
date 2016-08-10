@@ -51,7 +51,7 @@ function getAllProducts() {
 //    source: function (request, response) {
 //        var suggestions = [];
 //
-//        $.each(productList, function (i, product) {
+//        $.each(buyerList, function (i, product) {
 //            if (product.name.toLowerCase().indexOf($('#name-text-box').val().toLowerCase()) != -1) {
 //                suggestions.push(product.name);
 //            }
@@ -64,7 +64,7 @@ function getAllProducts() {
 //        var selectedName = ui.item.value;
 //        var result = searchProduct(selectedName);
 //
-//        showProduct(result);
+//        showBuyer(result);
 //    }
 //});
 

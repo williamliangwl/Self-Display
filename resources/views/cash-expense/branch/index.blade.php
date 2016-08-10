@@ -4,8 +4,8 @@
 
     <div class="row ">
         <div class="col-md-8 col-md-offset-2">
-            <h4>Tambah Pengeluaran</h4>
-            <form class="form-inline" name="add-expense" action="{{url('/expense/create')}}" method="post">
+            <h4>Tambah Pembelian Cash</h4>
+            <form class="form-inline" name="add-expense" action="{{url('/cash-expense/create')}}" method="post">
                 {!! csrf_field() !!}
                 <div class="form-group">
                     <input class="form-control" type="date" placeholder="Tanggal" name="date" value="{{date('Y-m-d')}}" required/>
@@ -28,9 +28,9 @@
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             @if(count($expenses) == 0)
-                <h3>Tidak ada pengeluaran.</h3>
+                <h4>Tidak ada pembelian cash.</h4>
             @else
-                <h4>List Pengeluaran</h4>
+                <h4>List Pembelian Cash</h4>
                 <table class="table">
                     <tr>
                         <th>Tanggal</th>
@@ -72,7 +72,7 @@
         </div>
     </div>
 
-    <form class="form-horizontal" action="{{url('expense/delete')}}" method="post">
+    <form class="form-horizontal" action="{{url('cash-expense/delete')}}" method="post">
         <div id="deleteModal" class="modal fade" tabindex="-1" role="dialog">
             <div class="modal-dialog modal-sm">
                 <div class="modal-content">
@@ -108,7 +108,7 @@
         </div><!-- /.modal -->
     </form>
 
-    <form class="form-horizontal" action="{{url('/expense/update')}}" method="post">
+    <form class="form-horizontal" action="{{url('/cash-expense/update')}}" method="post">
         <div id="updateModal" class="modal fade" tabindex="-1" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -157,5 +157,5 @@
 @endsection
 
 @section('js')
-    <script type="application/javascript" src="/js/expense.admin.js"></script>
+    <script type="application/javascript" src="/js/cash.expense.branch.js"></script>
 @endsection

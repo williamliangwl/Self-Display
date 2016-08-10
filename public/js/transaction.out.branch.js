@@ -2,6 +2,15 @@
  * Created by willi on 29-May-16.
  */
 var items = [];
+var selectedIds = [];
+var allProducts = [];
+
+$.post('/product/all', {
+    '_token': $('#_token').val()
+}, function (data) {
+    allProducts = data;
+    refreshProducts(allProducts);
+});
 
 function refreshProducts(products) {
     $('#product-table').html('' +
@@ -10,12 +19,10 @@ function refreshProducts(products) {
         '<th>Nama</th>' +
         '<th>Stok</th>' +
         '<th>Harga Jual</th>' +
-        '<th>Kuantitas</th>' +
-        '<th>Harga Deal</th>' +
         '</tr>');
 
     for (var i = 0; i < products.length; i++) {
-        if (products[i].stock > 0) {
+        if (products[i].stock > 0 && selectedIds.indexOf(products[i].id) == -1) {
             $('#product-table').append('' +
                 '<tr>' +
                 '<td>' +
@@ -34,6 +41,8 @@ function refreshProducts(products) {
         }
     }
 
+
+    $('.selected-product').unbind("click");
     $('.selected-product').click(toggleInputs);
 }
 
@@ -50,7 +59,6 @@ $('#confirm-button').click(function () {
         function (data) {
             if (!isNaN(data)) {// expect buyer id
                 var buyerId = data;
-
                 //create transaction
                 $.post(
                     '/transaction/out/create',
@@ -70,6 +78,8 @@ $('#confirm-button').click(function () {
                             $.post('/product/all', {
                                 '_token': $('#_token').val()
                             }, function (data) {
+                                selectedIds.splice();
+                                $('.selected-product:checked').click();
                                 refreshProducts(data);
                             });
 
@@ -143,7 +153,7 @@ $('#recordOutTransaction').on('show.bs.modal', function () {
     $('#report-button').addClass('hidden');
 });
 
-$('#phone-text').keyup(function () {
+$('#phone-text').focusout(function () {
     var phone = $('#phone-text').val();
     if (phone.length >= 10) {
         $.post('/buyer/get', {
@@ -157,15 +167,17 @@ $('#phone-text').keyup(function () {
     }
 });
 
-$('#phone-text').focusout(function () {
+$('#name-text').focusout(function () {
     var phone = $('#phone-text').val();
-    if (phone.length >= 10) {
+    var name = $('#name-text').val();
+    if (name.length > 2) {
         $.post('/buyer/get', {
             '_token': $('#_token').val(),
-            'phone': phone
+            'phone': phone,
+            'name': name
         }, function (data) {
             var buyer = data;
-            $('#name-text').val(buyer.name);
+            $('#phone-text').val(buyer.phone);
             $('#address-text').val(buyer.address);
         });
     }
@@ -184,8 +196,37 @@ function money(text) {
 }
 
 function toggleInputs() {
+    var element = $(this).parent().parent().detach();
+    if (this.checked) {
+        selectedIds.push(parseInt(this.value));
+        $('#chosen-product-table').append(element);
+    }
+    else {
+        if (selectedIds.indexOf(parseInt(this.value)) > -1)
+            selectedIds.splice(selectedIds.indexOf(parseInt(this.value)), 1);
+
+        filterProduct();
+    }
+
     var quantity_input = $(this).parent().siblings('.quantity-column').children('input');
     var deal_price_input = $(this).parent().siblings('.deal-price-column').children('input');
     $(quantity_input).toggleClass('hidden');
     $(deal_price_input).toggleClass('hidden');
+}
+
+$('#name-text-box').keyup(filterProduct);
+
+function filterProduct() {
+    var selectedName = $('#name-text-box').val();
+    var result = searchProduct(selectedName);
+
+    refreshProducts(result);
+}
+
+function searchProduct(query) {
+    var result = $.grep(allProducts, function (item, i) {
+        return (item.name.toLowerCase().indexOf(query.toLowerCase()) != -1);
+    });
+
+    return result;
 }

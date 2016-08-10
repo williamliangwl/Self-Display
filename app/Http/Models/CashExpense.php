@@ -18,6 +18,7 @@ class CashExpense extends Model
         'id',
         'date',
         'description',
-        'price'
+        'price',
+        'user_id'
     ];
 }

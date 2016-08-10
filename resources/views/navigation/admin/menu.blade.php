@@ -5,7 +5,7 @@
         Transaksi <span class="caret"></span>
     </a>
     <ul class="dropdown-menu">
-        <li><a href="{{url('/transaction/in')}}">Transaksi Masuk</a></li>
+        <li><a href="{{url('/transaction/in')}}">Histori Tambah Stok</a></li>
         <li><a href="{{url('/transaction/out')}}">Transaksi Keluar</a></li>
     </ul>
 </li>
@@ -15,7 +15,7 @@
     </a>
     <ul class="dropdown-menu">
         <li><a href="{{url('/expense')}}">Pengeluaran Harian</a></li>
-        <li><a href="{{url('/cash-expense')}}">Pengeluaran Cash</a></li>
+        <li><a href="{{url('/cash-expense')}}">Pembelian Cash</a></li>
     </ul>
 </li>
 <li class="dropdown">

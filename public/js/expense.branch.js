@@ -14,10 +14,22 @@ function populateProductField(event) {
     var modal = $(this);
     modal.find('#item-id').val(id);
     modal.find('#item-date').val(date).html(date);
-    modal.find('#item-price').val(price).html(price);
+    modal.find('#item-price').val(price).html(money(price));
     modal.find('#item-description').val(description).html(description);
     //modal.find('#item-capital-price').val(capital).html(capital);
 }
 
 $('#deleteModal').on('show.bs.modal', populateProductField);
 $('#updateModal').on('show.bs.modal', populateProductField);
+
+function money(text) {
+    text = text.toString();
+    if (text.indexOf('Rp') == 0) {
+        text = text.substr(2);
+    }
+    var chars = text.split('').reverse();
+    for (var i = 3; i < text.length; i += 4) {
+        chars.splice(i, 0, ".");
+    }
+    return chars.reverse().join('');
+}

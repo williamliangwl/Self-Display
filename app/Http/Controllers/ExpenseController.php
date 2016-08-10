@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Constants;
 use App\Http\Models\Expense;
+use App\Http\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -16,10 +17,24 @@ class ExpenseController extends Controller
 {
     public function index()
     {
-        if (Auth::user() && Auth::user()->role == Constants::ROLE_ADMIN) {
-            $expenses = Expense::orderBy('date', 'desc')->get();
+        if (Auth::user()) {
+            switch (Auth::user()->role) {
+                case Constants::ROLE_BRANCH:
+                    $expenses = Expense::where('user_id', Auth::user()->id)->orderBy('date', 'desc')->get();
+                    return view('expense.branch.index', ['expenses' => $expenses]);
+                    break;
+                case Constants::ROLE_ADMIN:
+                    $expenses = Expense::orderBy('date', 'desc')->get()->groupBy('user_id');
+                    $expensesMap = [];
 
-            return view('expense.index', ['expenses' => $expenses]);
+                    foreach ($expenses as $userId => $expenseList) {
+                        $user = User::find($userId);
+                        $expensesMap[$user->name] = $expenseList;
+                    }
+
+                    return view('expense.admin.index', ['expensesMap' => $expensesMap]);
+                    break;
+            }
 
         } else {
             return redirect('/');
@@ -28,7 +43,7 @@ class ExpenseController extends Controller
 
     public function create(Request $request)
     {
-        if (Auth::user() && Auth::user()->role == Constants::ROLE_ADMIN) {
+        if (Auth::user()) {
             try {
 
                 DB::beginTransaction();
@@ -37,6 +52,7 @@ class ExpenseController extends Controller
                     'date' => $request['date'],
                     'price' => $request['price'],
                     'description' => $request['description'],
+                    'user_id' => Auth::user()->id
                 ]);
 
                 DB::commit();
@@ -52,7 +68,7 @@ class ExpenseController extends Controller
 
     public function delete(Request $request)
     {
-        if (Auth::user() && Auth::user()->role == Constants::ROLE_ADMIN) {
+        if (Auth::user()) {
             try {
                 DB::beginTransaction();
 
@@ -73,7 +89,7 @@ class ExpenseController extends Controller
 
     public function update(Request $request)
     {
-        if (Auth::user() && Auth::user()->role == Constants::ROLE_ADMIN) {
+        if (Auth::user()) {
             try {
 
                 DB::beginTransaction();
