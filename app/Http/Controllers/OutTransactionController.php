@@ -100,6 +100,7 @@ class OutTransactionController extends Controller
                 return $outTransaction->id;
 
             } catch (\Exception $e) {
+                Log::info($e->getMessage());
                 Log::info($e->getTraceAsString());
                 DB::rollback();
                 return $e->getMessage();
