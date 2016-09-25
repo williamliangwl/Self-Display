@@ -117,7 +117,7 @@ $('#checkout-button').click(function () {
         items.push({
             'id': $(checkeds[i]).val(),
             'name': $(siblings[0]).html(),
-            'stock': $(siblings[2]).html(),
+            'stock': $(siblings[1]).html(),
             'quantity': $(siblings[3]).children('input').val(),
             'price': $(siblings[4]).children('input').val()
         });
