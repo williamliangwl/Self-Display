@@ -90,7 +90,7 @@ class OutTransactionController extends Controller
 
                     $product = Product::find($outDetailTransaction->product_id);
                     if (!$product || $product->stock - $outDetailTransaction->quantity < 0)
-                        throw new \Exception('Produk tidak ditemukan atau stok tidak mencukupi');
+                        throw new \Exception('Produk tidak ditemukan atau stok tidak mencukupi : ' . $outDetailTransaction->product_id . ' # ' . $item['id']);
                     $product->stock -= $outDetailTransaction->quantity;
                     $product->save();
                 }
