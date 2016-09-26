@@ -57,9 +57,10 @@
                     <th style="text-align: left;" >HRG SATUAN</th>
                     <th style="text-align: left;" >TOTAL HRG</th>
                 </tr>
+                <?php $num = 1 ?>
                 @foreach($transaction[0]['transaction_details'] as $transactionDetail)
                     <tr>
-                        <td>1</td>
+                        <td><?php echo $num++ ?></td>
                         <td>{{$transactionDetail['product_name']}}</td>
                         <td>{{$transactionDetail['product_quantity']}}</td>
                         <td>Rp{{number_format($transactionDetail['product_price'],0,',','.')}}</td>

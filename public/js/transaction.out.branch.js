@@ -161,8 +161,10 @@ $('#phone-text').focusout(function () {
             'phone': phone
         }, function (data) {
             var buyer = data;
-            $('#name-text').val(buyer.name);
-            $('#address-text').val(buyer.address);
+            if(buyer) {
+                $('#name-text').val(buyer.name);
+                $('#address-text').val(buyer.address);
+            }
         });
     }
 });
@@ -177,8 +179,10 @@ $('#name-text').focusout(function () {
             'name': name
         }, function (data) {
             var buyer = data;
-            $('#phone-text').val(buyer.phone);
-            $('#address-text').val(buyer.address);
+            if (buyer) {
+                $('#phone-text').val(buyer.phone);
+                $('#address-text').val(buyer.address);
+            }
         });
     }
 });
