@@ -83,7 +83,7 @@ class OutTransactionController extends Controller
                     $outDetailTransaction = OutDetailTransaction::create([
                         'transaction_id' => $outTransaction->id,
                         'product_id' => $item['id'],
-                        'quantity' => intval($item['quantity']),
+                        'quantity' => $item['quantity'],
                         'deal_price' => $item['price'],
                         'capital_price' => Product::find($item['id'])->capital_price,
                     ]);
