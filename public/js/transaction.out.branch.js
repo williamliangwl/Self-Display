@@ -69,6 +69,7 @@ $('#confirm-button').click(function () {
                     },
                     function (data) {
                         if (!isNaN(data)) { //expect transactionid
+                            items = [];
                             $('#confirm-button').html('Berhasil');
                             $('#confirm-button').addClass('hidden');
                             $('#cancel-button').addClass('hidden');
